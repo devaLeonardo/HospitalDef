@@ -1,6 +1,4 @@
-html {
-    font-size: 14px;
-}
+
 
 @media (min-width: 768px) {
     html {
@@ -18,7 +16,11 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
+    margin-bottom: 0px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
 }
 
 
@@ -33,7 +35,7 @@ body {
     --radius: 0.7rem;
 }
 
-/* Base */
+
 html, body {
     height: 100%;
 }

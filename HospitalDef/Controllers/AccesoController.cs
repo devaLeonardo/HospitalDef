@@ -25,7 +25,7 @@ namespace HospitalDef.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Pacientes");
             }
             return View();
         }
@@ -64,13 +64,21 @@ namespace HospitalDef.Controllers
                     // 5. Creamos el principal de la identidad
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+                    var props = new AuthenticationProperties
+                    {
+                        // ISPERSISTENT = FALSE (No la guardes en el disco duro del usuario)
+                        IsPersistent = false
+                        // No se necesita ExpiresUtc, ya que es una cookie de sesión
+                    };
+
                     // 6. Inicia sesión en el sistema (CREA LA COOKIE)
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity));
+                        new ClaimsPrincipal(claimsIdentity),
+                            props);
 
                     // 7. Redirigimos al Home
-                    return RedirectToAction("Index", "Citas");
+                    return RedirectToAction("Index", "Pacientes");
                 }
             }
 

@@ -1,6 +1,59 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<main class="py-5 bg-light">
+<div class="container">
 
-<p>Use this page to detail your site's privacy policy.</p>
+    <div class="row text-center mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold text-primary">Contáctanos</h1>
+            <p class="lead text-secondary">Estamos aquí para responder tus preguntas. Envíanos un mensaje o visítanos.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="card-title mb-4">Envía un Mensaje</h3>
+                    <form action="#" method="POST">
+
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="ejemplo@dominio.com" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="mensaje" class="form-label">Tu Mensaje</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Escribe tu consulta aquí..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-secondary text-white shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Nuestra Ubicación</h4>
+                    <div class="ratio ratio-16x9 mb-3 rounded overflow-hidden">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.51325607908!2d-99.1678200856067!3d19.41460338690373!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff3743c3f915%3A0x8e8e7a0e374d6c6!2sEl%20%C3%81ngel%20de%20la%20Independencia!5e0!3m2!1ses!2smx!4v1678822554000!5m2!1ses!2smx" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                    <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i> Avenida Reforma, 123, Ciudad de México</p>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i> +52 55 1234 5678</p>
+                    <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> info@miempresa.com</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</main>
