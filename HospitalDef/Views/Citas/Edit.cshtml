@@ -1,0 +1,69 @@
+﻿@model HospitalDef.Models.Cita
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Cita</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="FolioCitas" />
+            <div class="form-group">
+                <label asp-for="idPaciente" class="control-label"></label>
+                <select asp-for="idPaciente" class="form-control" asp-items="ViewBag.IdPaciente"></select>
+                <span asp-validation-for="idPaciente" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="idDoctor" class="control-label"></label>
+                <select asp-for="idDoctor" class="form-control" asp-items="ViewBag.IdDoctor"></select>
+                <span asp-validation-for="idDoctor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="fechaCreacionCita" class="control-label"></label>
+                <input asp-for="fechaCreacionCita" class="form-control" />
+                <span asp-validation-for="fechaCreacionCita" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="fechaCita" class="control-label"></label>
+                <input asp-for="fechaCita" class="form-control" />
+                <span asp-validation-for="fechaCita" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="horaCita" class="control-label"></label>
+                <input asp-for="horaCita" class="form-control" />
+                <span asp-validation-for="horaCita" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="horaInicio" class="control-label"></label>
+                <input asp-for="horaInicio" class="form-control" />
+                <span asp-validation-for="horaInicio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="horaTermino" class="control-label"></label>
+                <input asp-for="horaTermino" class="form-control" />
+                <span asp-validation-for="horaTermino" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="estatusAtencion" class="control-label"></label>
+                <input asp-for="estatusAtencion" class="form-control" />
+                <span asp-validation-for="estatusAtencion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

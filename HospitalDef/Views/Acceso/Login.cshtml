@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "_Layout";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form id="account" method="post" asp-controller="Acceso" asp-action="Login">
+
+                <hr />
+
+                @if (ViewData["Mensaje"] != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @ViewData["Mensaje"]
+                    </div>
+                }
+
+                <div class="form-floating mb-3">
+                    <input name="nombreUsuario" class="form-control" autocomplete="username" aria-required="true" placeholder="TuUsuario" />
+                    <label for="nombreUsuario">Nombre de Usuario</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input name="contraseña" type="password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <label for="contraseña">Contraseña</label>
+                </div>
+
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Entrar</button>
+                </div>
+                <div class="form-floating mt-3">
+                    <p>
+                        <a asp-controller="Registro" asp-action="Registrar">¿No tienes cuenta? Regístrate aquí.</a>
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

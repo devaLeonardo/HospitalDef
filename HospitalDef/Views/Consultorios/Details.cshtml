@@ -1,0 +1,36 @@
+﻿@model HospitalDef.Models.Consultorio
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Consultorio</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Planta)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Planta)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Numero)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Numero)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Edificio)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Edificio)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.IdConsultorio">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

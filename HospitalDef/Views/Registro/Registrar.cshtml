@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Registrar Nueva Cuenta";
+    Layout = "_Layout";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>Crea una nueva cuenta para acceder al sistema.</p>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+
+        <form id="registerForm" method="post" asp-controller="Registro" asp-action="Registrar">
+
+            @if (ViewData["Mensaje"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewData["Mensaje"]
+                </div>
+            }
+
+            <div class="form-floating mb-3">
+                <input name="correo" type="email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label for="correo">Correo Electrónico</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input name="nombreUsuario" class="form-control" aria-required="true" placeholder="Tu Nombre" />
+                <label for="nombreUsuario">Nombre de Usuario</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input name="telefono" class="form-control" aria-required="true" placeholder="Tu Teléfono" />
+                <label for="telefono">Teléfono</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input name="contraseña" type="password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="contraseña">Contraseña</label>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Registrar</button>
+
+            <div class="form-floating mt-3">
+                <p>
+                    <a asp-controller="Acceso" asp-action="Login">¿Ya tienes cuenta? Inicia sesión.</a>
+                </p>
+            </div>
+        </form>
+
+    </div>
+</div>

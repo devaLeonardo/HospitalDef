@@ -1,0 +1,30 @@
+﻿@model IEnumerable<HospitalDef.Models.Paciente>
+
+@{
+    ViewData["Title"] = "Mod Paciente";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/sitePaciente.css" asp-append-version="true" />
+</head>
+
+<h1>Hola ---, Bienvenido de nuevo</h1>
+<br /> <br />
+<h2>Tu modulo</h2>
+<br />
+<div class="container-fluid">
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Citas" asp-action="Create">Agendar cita</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Citas" asp-action="Index">Citas Agendadas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Pacientes" asp-action="Index">Datos personales</a>
+            </li>
+        </ul>
+    </div>
+</div>
+

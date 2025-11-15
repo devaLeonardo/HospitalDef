@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HospitalDef.Models;
+
+namespace HospitalDef.Controllers
+{
+    public class HistorialMedicoPacientesController : Controller
+    {
+        private readonly HospitalContext _context;
+
+        public HistorialMedicoPacientesController(HospitalContext context)
+        {
+            _context = context;
+        }
+
+        // GET: HistorialMedicoPacientes
+        public async Task<IActionResult> Index()
+        {
+            var hospitalContext = _context.HistorialMedicoPacientes.Include(h => h.IdPacienteNavigation);
+            return View(await hospitalContext.ToListAsync());
+        }
+
+        // GET: HistorialMedicoPacientes/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var historialMedicoPaciente = await _context.HistorialMedicoPacientes
+                .Include(h => h.IdPacienteNavigation)
+                .FirstOrDefaultAsync(m => m.IdHistorialMedicoPaciente == id);
+            if (historialMedicoPaciente == null)
+            {
+                return NotFound();
+            }
+
+            return View(historialMedicoPaciente);
+        }
+
+        // GET: HistorialMedicoPacientes/Create
+        public IActionResult Create()
+        {
+            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+            return View();
+        }
+
+        // POST: HistorialMedicoPacientes/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("IdHistorialMedicoPaciente,IdPaciente,Peso,Altura,Alergias,TipoSangre,Padecimientos")] HistorialMedicoPaciente historialMedicoPaciente)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(historialMedicoPaciente);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
+            return View(historialMedicoPaciente);
+        }
+
+        // GET: HistorialMedicoPacientes/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var historialMedicoPaciente = await _context.HistorialMedicoPacientes.FindAsync(id);
+            if (historialMedicoPaciente == null)
+            {
+                return NotFound();
+            }
+            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
+            return View(historialMedicoPaciente);
+        }
+
+        // POST: HistorialMedicoPacientes/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("IdHistorialMedicoPaciente,IdPaciente,Peso,Altura,Alergias,TipoSangre,Padecimientos")] HistorialMedicoPaciente historialMedicoPaciente)
+        {
+            if (id != historialMedicoPaciente.IdHistorialMedicoPaciente)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(historialMedicoPaciente);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!HistorialMedicoPacienteExists(historialMedicoPaciente.IdHistorialMedicoPaciente))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
+            return View(historialMedicoPaciente);
+        }
+
+        // GET: HistorialMedicoPacientes/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var historialMedicoPaciente = await _context.HistorialMedicoPacientes
+                .Include(h => h.IdPacienteNavigation)
+                .FirstOrDefaultAsync(m => m.IdHistorialMedicoPaciente == id);
+            if (historialMedicoPaciente == null)
+            {
+                return NotFound();
+            }
+
+            return View(historialMedicoPaciente);
+        }
+
+        // POST: HistorialMedicoPacientes/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var historialMedicoPaciente = await _context.HistorialMedicoPacientes.FindAsync(id);
+            if (historialMedicoPaciente != null)
+            {
+                _context.HistorialMedicoPacientes.Remove(historialMedicoPaciente);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool HistorialMedicoPacienteExists(int id)
+        {
+            return _context.HistorialMedicoPacientes.Any(e => e.IdHistorialMedicoPaciente == id);
+        }
+    }
+}
