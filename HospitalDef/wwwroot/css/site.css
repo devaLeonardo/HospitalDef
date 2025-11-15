@@ -1,22 +1,176 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+
+
+:root {
+    --primary: #0a6fb8; /* azul principal */
+    --primary-700: #075c96;
+    --accent: #14a098; /* verde-azulado */
+    --bg: #f4f8fb;
+    --muted: #6b7a88;
+    --card: #ffffff;
+    --radius: 0.7rem;
+}
+
+/* Base */
+html, body {
+    height: 100%;
+}
+
+body {
+    background: linear-gradient(180deg, var(--bg) 0%, #eef6fb 100%);
+    color: #0f2540;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Header / Navbar / Brand */
+.site-header .navbar {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+}
+
+.brand-title {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.navbar .nav-link {
+    color: rgba(15,37,64,0.8);
+}
+
+    .navbar .nav-link:hover {
+        color: var(--primary);
+    }
+
+/* Hero */
+.hero {
+    background: linear-gradient(90deg, rgba(10,111,184,0.9) 0%, rgba(20,160,152,0.9) 100%);
+    padding-top: 2.2rem;
+    padding-bottom: 2.4rem;
+    border-bottom-left-radius: 0.8rem;
+    border-bottom-right-radius: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.hero-sub {
+    opacity: 0.95;
+    color: rgba(255,255,255,0.95);
+}
+
+.hero-img {
+    max-width: 420px;
+    object-fit: cover;
+    box-shadow: 0 12px 30px rgba(10,111,184,0.12);
+    transform: translateY(-6px);
+}
+
+/* Cards */
+.card {
+    border-radius: var(--radius);
+    background: var(--card);
+    border: none;
+    box-shadow: 0 8px 26px rgba(15,37,64,0.06);
+}
+
+/* Tables (estilo profesional) */
+.table {
+    background: transparent;
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+    .table thead th {
+        background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(245,249,252,0.9));
+        color: var(--primary-700);
+        font-weight: 700;
+        border-bottom: 1px solid rgba(15,37,64,0.06);
+        padding: 0.85rem 1rem;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .table tbody td {
+        padding: 0.9rem 1rem;
+        vertical-align: middle;
+    }
+/* Botones */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(10,111,184,0.08);
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-700);
+        border-color: var(--primary-700);
+    }
+
+/* Avatar */
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    box-shadow: 0 6px 18px rgba(10,111,184,0.08);
+}
+
+/* Footer */
+footer {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+/* Responsive: reducir hero en móviles */
+@media (max-width: 991px) {
+    .hero {
+        padding-top: 1.6rem;
+        padding-bottom: 1.6rem;
+    }
+
+    .hero-title {
+        font-size: 1.5rem;
+    }
+
+    .hero-img {
+        display: none;
+    }
+}
+
+/* Asegurar que nuestros estilos prevalecen sobre Bootstrap cuando sea necesario */
+.table, .table th, .table td {
+    border-color: rgba(15,37,64,0.04);
 }

@@ -3,7 +3,20 @@
 }
 
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero py-5">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-white">
+                <h1 class="hero-title mb-2">Atención médica integral</h1>
+                <p class="lead hero-sub">Equipo profesional y tecnología a tu servicio. Atención de urgencias y consulta especializada.</p>
+                <div class="mt-4">
+                    <a class="btn btn-light btn-lg me-2" asp-controller="Home" asp-action="servicios">Nuestros servicios</a>
+                    <a class="btn btn-outline-light btn-lg" asp-controller="Home" asp-action="Privacy">Contáctanos</a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-end">
+                <img src="~/images/hero.jpg" alt="Hospital" class="img-fluid rounded shadow-lg hero-img" asp-append-version="true" />
+            </div>
+        </div>
+    </div>
+</section>
