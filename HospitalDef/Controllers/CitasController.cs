@@ -48,7 +48,7 @@ namespace HospitalDef.Controllers
         // GET: Citas/Create
         public IActionResult Create()
         {
-            var especialidades = _context.Especialidades.ToList();
+            var especialidades = _context.Especialidades;
             ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
             ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
             ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");  

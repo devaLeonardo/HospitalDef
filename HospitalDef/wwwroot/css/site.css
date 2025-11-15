@@ -172,7 +172,7 @@ footer {
     }
 }
 
-/* Asegurar que nuestros estilos prevalecen sobre Bootstrap cuando sea necesario */
+
 .table, .table th, .table td {
     border-color: rgba(15,37,64,0.04);
 }
