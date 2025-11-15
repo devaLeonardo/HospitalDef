@@ -229,9 +229,6 @@ namespace HospitalDef.Controllers
             return View(cita);
         }       
 
-
-
-
             // GET: Citas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
