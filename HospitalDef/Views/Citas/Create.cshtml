@@ -67,10 +67,11 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary">Regresar </a>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
         <script>
         $(document).ready(function () {
