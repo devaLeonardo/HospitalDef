@@ -51,11 +51,13 @@ namespace HospitalDef.Controllers
                         ViewData["Mensaje"] = "Su cuenta está desactivada.";
                         return View();
                     }
+                    var paciente = await _context.Pacientes.FirstOrDefaultAsync(d => d.IdUsuario == usuario.IdUsuario);
 
                     // 4. Creamos la "Identidad" (la credencial) del usuario
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, usuario.NombreUsuario),
+                        new Claim(ClaimTypes.GivenName, paciente.Nombre),
                         new Claim(ClaimTypes.Email, usuario.Correo),
                         new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
                         // (Opcional) Aquí podrías agregar roles

@@ -5,8 +5,13 @@
 }
 
 <div class="col-sm p-4 main-content-area">
-    <h1>Hola ---, Bienvenido de nuevo</h1>
-    <h2>Tu modulo</h2>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+        <h1>Hola @nombre, Bienvenido</h1>
+    }
+    <h2>Tu modulo:</h2>
 </div>
 
     <div id="sidebar-menu">

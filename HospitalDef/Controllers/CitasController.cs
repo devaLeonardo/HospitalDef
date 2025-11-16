@@ -116,6 +116,10 @@ namespace HospitalDef.Controllers
 
             if (!ModelState.IsValid)
             {
+                var especialidades = _context.Especialidades;
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
                 return View(cita);
             }
 
@@ -139,14 +143,19 @@ namespace HospitalDef.Controllers
 
             if (!ModelState.IsValid)
             {
+                var especialidades = _context.Especialidades;
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
                 return View(cita);
             }
 
 
             // para ver si el doctor chambea en el horario que se agarro
 
-            var doctor = await _context.Empleados.FindAsync(cita.idDoctor);
-            int doctorHorario = (int) doctor.IdHorario;
+            var doctor = await _context.Doctors.FindAsync(cita.idDoctor);
+            var doctorBien = await _context.Empleados.FindAsync(doctor.IdEmpleado);
+            int doctorHorario = (int) doctorBien.IdHorario;
 
             TimeSpan horaInicioRequerida = inicioCita.TimeOfDay;
             DayOfWeek diaSemana = inicioCita.DayOfWeek;
@@ -189,11 +198,15 @@ namespace HospitalDef.Controllers
 
             if (!horarioValido)
             {
-                ModelState.AddModelError("HoraCita", $"El horario seleccionado no es válido. El doctor trabaja en el turno '{doctorHorario}' (ej: Mañana es de 9:00 a 14:00 de Lunes a Viernes).");
+                ModelState.AddModelError("FechaCita", $"El horario seleccionado no es válido. El doctor trabaja en el turno '{doctorHorario}' (ej: Mañana es de 9:00 a 14:00 de Lunes a Viernes).");
             }
 
             if (!ModelState.IsValid)
             {
+                var especialidades = _context.Especialidades;
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
                 return View(cita);
             }
 
@@ -209,15 +222,23 @@ namespace HospitalDef.Controllers
 
             if (citaEncimada != null)
             {
-                ModelState.AddModelError("HoraCita", "El doctor ya tiene una cita agendada o pendiente de pago que se solapa con el horario seleccionado. Intenta otra hora.");
+                ModelState.AddModelError("FechaCita", "El doctor ya tiene una cita agendada o pendiente de pago que se solapa con el horario seleccionado. Intenta otra hora.");
             }
             if (!ModelState.IsValid)
             {
+                var especialidades = _context.Especialidades;
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
                 return View(cita);
             }
 
             cita.estatusAtencion = "Agendada pendiente de pago";
             cita.fechaCreacionCita = DateTime.Now.Date;
+            cita.horaCita = new TimeOnly(cita.fechaCita.Hour, cita.fechaCita.Minute);
+            cita.horaInicio = cita.horaCita;
+            cita.horaTermino = cita.horaInicio.AddMinutes(60);
+
 
             _context.Add(cita);
             await _context.SaveChangesAsync();

@@ -29,6 +29,7 @@
                     class="form-control"
                     disabled="disabled">
           
+
                 <option value="">-- Selecciona primero una Especialidad --</option>
             </select>
             <span asp-validation-for="idDoctor" class="text-danger"></span>
@@ -38,27 +39,9 @@
                 <input asp-for="fechaCita" class="form-control" />
                 <span asp-validation-for="fechaCita" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="horaCita" class="control-label"></label>
-                <input asp-for="horaCita" class="form-control" />
-                <span asp-validation-for="horaCita" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="horaInicio" class="control-label"></label>
-                <input asp-for="horaInicio" class="form-control" />
-                <span asp-validation-for="horaInicio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="horaTermino" class="control-label"></label>
-                <input asp-for="horaTermino" class="form-control" />
-                <span asp-validation-for="horaTermino" class="text-danger"></span>
-            </div>
+          
+            
 
-            <div class="form-group">
-                <label asp-for="estatusAtencion" class="control-label"></label>
-                <input asp-for="estatusAtencion" class="form-control" />
-                <span asp-validation-for="estatusAtencion" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

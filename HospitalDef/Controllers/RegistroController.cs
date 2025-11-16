@@ -58,8 +58,8 @@ namespace HospitalDef.Controllers
             _context.Usuarios.Add(nuevoUsuario);
             await _context.SaveChangesAsync();
 
-            // Lo mandamos al Login para que inicie sesión
-            return RedirectToAction("Login", "Acceso");
+            // Lo mandamos a que se registre como paciente
+            return RedirectToAction("Create", "Pacientes");
         }
     }
 }
