@@ -8,20 +8,21 @@ namespace HospitalDef.Models;
 public partial class Cita
 {
     public int FolioCitas { get; set; }
-
+    [Required(ErrorMessage = "Debe seleccionar un paciente.")]
     public int? idPaciente { get; set; }
-
+    [Required(ErrorMessage = "Debe seleccionar un doctor.")]
     public int? idDoctor { get; set; }
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTime fechaCreacionCita { get; set; }
 
+
+   
     public DateTime fechaCita { get; set; }
 
-    public TimeOnly horaCita { get; set; }
+    public TimeSpan horaCita { get; set; }
 
-    public TimeOnly horaInicio { get; set; }
+    public TimeSpan horaInicio { get; set; }
 
-    public TimeOnly horaTermino { get; set; }
+    public TimeSpan horaTermino { get; set; }
 
     public string estatusAtencion { get; set; } = null!;
 

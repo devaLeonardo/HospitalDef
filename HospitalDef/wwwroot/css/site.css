@@ -173,6 +173,43 @@ footer {
 }
 
 
+/* styles.css */
+
+/* 1. Estilo para el Contenedor del Formulario */
+.agendar-form-container {
+    /* Fondo blanco con esquinas redondeadas */
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    /* Asegura que el formulario esté en el centro de la página (si está envuelto en un row justify-content-center) */
+}
+
+/* 2. Estilo para el Título Principal */
+.form-header h1 {
+    color: #007bff; /* Color primario de Bootstrap (azul) */
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.form-header h4 {
+    color: #6c757d; /* Color secundario (gris) */
+    margin-top: 5px;
+    font-size: 1.1rem;
+}
+
+/* 3. Estilo para el Botón de Regreso */
+.btn-secondary {
+    /* Pequeño margen para separarlo del botón principal si están juntos */
+    margin-left: 10px;
+}
+
+/* 4. Estilo de los campos SELECT (para mejor legibilidad) */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
 .table, .table th, .table td {
     border-color: rgba(15,37,64,0.04);
 }
