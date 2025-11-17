@@ -17,33 +17,55 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+            <!-- PACIENTE -->
             <div class="form-group mb-3">
-                <label asp-for="idPaciente" class="control-label">Paciente: </label>
-                <select asp-for="idPaciente" class="form-control" asp-items="ViewBag.IdPaciente"></select>
+                <label>Paciente:</label>
+
+                <!-- Nombre visible -->
+                <input class="form-control" value="@ViewBag.PacienteNombre" disabled />
+
+                <!-- ID oculto (se mantiene SIEMPRE) -->
+                <input type="hidden" asp-for="idPaciente" value="@ViewBag.PacienteId" />
             </div>
 
+            <!-- ESPECIALIDAD -->
             <div class="form-group mb-3">
-                <label asp-for="EspecialidadIdFiltro" class="control-label">Especialidad: </label>
-                <select asp-for="EspecialidadIdFiltro" id="ddlEspecialidad" class="form-control" asp-items="@(ViewBag.Especialidades as SelectList)">
+                <label asp-for="EspecialidadIdFiltro" class="control-label">Especialidad:</label>
+
+                <select asp-for="EspecialidadIdFiltro"
+                        id="ddlEspecialidad"
+                        class="form-control"
+                        asp-items="@(ViewBag.Especialidades as SelectList)">
                     <option value="">-- Selecciona una Especialidad --</option>
                 </select>
+
                 <span asp-validation-for="EspecialidadIdFiltro" class="text-danger"></span>
             </div>
 
+            <!-- DOCTOR -->
             <div class="form-group mb-3">
                 <label asp-for="idDoctor" class="control-label">Doctor:</label>
-                <select id="ddlDoctor"
-                        asp-for="idDoctor"
+
+                <select asp-for="idDoctor"
+                        id="ddlDoctor"
                         class="form-control"
-                        disabled="disabled">
-                    <option value="">-- Selecciona primero una Especialidad --</option>
+                        asp-items="@(ViewBag.Doctores as SelectList)">
+                    <option value="">-- Selecciona un Doctor --</option>
                 </select>
+
                 <span asp-validation-for="idDoctor" class="text-danger"></span>
             </div>
 
+            <!-- FECHA CITA -->
             <div class="form-group mb-4">
-                <label asp-for="fechaCita" class="control-label"></label>
-                <input asp-for="fechaCita" class="form-control" type="datetime-local" />
+                <label asp-for="fechaCita" class="control-label">Fecha y Hora</label>
+
+                <input asp-for="fechaCita"
+                       type="datetime-local"
+                       class="form-control"
+                       value="@Model.fechaCita.ToString("yyyy-MM-ddTHH:mm")" />
+
+
                 <span asp-validation-for="fechaCita" class="text-danger"></span>
             </div>
 
@@ -60,63 +82,53 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-        <script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
         $(document).ready(function () {
+
+            // Si vuelve de una validación fallida y ya hay especialidad, cargar doctores automáticamente.
+            let especialidadSeleccionada = $("#ddlEspecialidad").val();
+            let doctorSeleccionado = "@Model.idDoctor";
+
+            if (especialidadSeleccionada) {
+                cargarDoctores(especialidadSeleccionada, doctorSeleccionado);
+            }
+
+            // Evento cuando cambia la especialidad
             $("#ddlEspecialidad").change(function () {
-
-                var especialidadId = $(this).val();
-
-                var ddlDoctor = $("#ddlDoctor");
-
-                ddlDoctor.prop("disabled", true).empty();
-                ddlDoctor.append('<option value="">-- Selecciona un Doctor --</option>');
-
-                if (especialidadId && especialidadId > 0) {
-
-                    // Mostrar mensaje de carga mientras se espera la respuesta
-                    ddlDoctor.append('<option value="">Cargando Doctores...</option>');
-
-                    // 3. LLAMADA AJAX AL CONTROLADOR
-                    $.ajax({
-                        url: '/Citas/GetDoctoresPorEspecialidad',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: { IdEspecialidad: especialidadId },
-
-                        // 4. MANEJO DE RESPUESTA EXITOSA
-                        success: function (data) {
-
-                            // Limpiar el dropdown de Doctores después de la carga
-                            ddlDoctor.empty();
-
-                            if (data.length > 0) {
-                                // Agregar el placeholder inicial
-                                ddlDoctor.append('<option value="">-- Selecciona un Doctor --</option>');
-
-                                $.each(data, function (index, doctor) {
-                                    ddlDoctor.append($('<option/>', {
-                                        value: doctor.value,
-                                        text: doctor.text
-                                    }));
-                                });
-                                ddlDoctor.prop("disabled", false);
-
-                            } else {
-                                ddlDoctor.append('<option value="">No hay Doctores disponibles</option>');
-                            }
-                        },
-
-                        error: function (xhr, status, error) {
-                            console.error("Error en la llamada AJAX: " + error);
-                            ddlDoctor.empty().append('<option value="">Error al cargar doctores</option>');
-                        }
-                    });
-                }
+                let espId = $(this).val();
+                $("#ddlDoctor").empty().append('<option value="">Cargando...</option>');
+                cargarDoctores(espId);
             });
+
+            function cargarDoctores(especialidadId, doctorActual = null) {
+                $.ajax({
+                    url: '/Citas/GetDoctoresPorEspecialidad',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { IdEspecialidad: especialidadId },
+                    success: function (data) {
+
+                        $("#ddlDoctor").empty().append('<option value="">-- Selecciona un Doctor --</option>');
+
+                        $.each(data, function (i, doctor) {
+                            $("#ddlDoctor").append($('<option/>', {
+                                value: doctor.value,
+                                text: doctor.text
+                            }));
+                        });
+
+                        // Mantener el doctor seleccionado tras la validación fallida
+                        if (doctorActual) {
+                            $("#ddlDoctor").val(doctorActual);
+                        }
+                    }
+                });
+            }
+
         });
     </script>
-
 }
-
-
