@@ -73,7 +73,7 @@ namespace HospitalDef.Controllers
 
             var cita = new Cita
             {
-                fechaCita = DateTime.Now
+                fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
             };
 
             CargarCombos(cita);
@@ -156,9 +156,9 @@ namespace HospitalDef.Controllers
 
             // Validar citas pendientes
             string[] estatusActivos = {
-        "Agendada pendiente de pago",
-        "Pagada pendiente por atender"
-    };
+                "Agendada pendiente de pago",
+                "Pagada pendiente por atender"
+            };
 
             var citaPendiente = await _context.Citas
                 .Where(c => c.idPaciente == cita.idPaciente &&
@@ -243,7 +243,7 @@ namespace HospitalDef.Controllers
                 return View(cita);
             }
 
-            // Guardar
+            // Guardar en la base de datos los cambios
             _context.Add(cita);
             await _context.SaveChangesAsync();
 
@@ -348,7 +348,7 @@ namespace HospitalDef.Controllers
         }
 
 
-        //metodo para recargar las citas
+        //metodo para recargar las citas y se mantengan guardados
         private void CargarCombos(Cita cita)
         {
             // Especialidades

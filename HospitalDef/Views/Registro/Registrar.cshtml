@@ -1,4 +1,7 @@
-﻿@section Styles {
+﻿@model HospitalDef.Models.Usuario
+
+
+@section Styles {
     <link rel="stylesheet" href="~/css/StyleLogin.css" />
 }
 
@@ -31,8 +34,8 @@
             </div>
 
             <div class="form-floating mb-3">
-                <input name="telefono" class="form-control" aria-required="true" placeholder="Tu Teléfono" />
-                <label for="telefono">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" type="number" />
+                <label for="Telefono">Teléfono</label>
             </div>
 
             <div class="form-floating mb-3">
