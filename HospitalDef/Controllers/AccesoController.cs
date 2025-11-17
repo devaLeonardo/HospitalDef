@@ -34,59 +34,84 @@ namespace HospitalDef.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string nombreUsuario, string contraseña)
         {
-            // 1. Buscamos al usuario por su nombreUsuario
             var usuario = await _context.Usuarios
-                                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
 
-            if (usuario != null)
+            if (usuario == null)
             {
-                // 2. ¡VERIFICACIÓN SEGURA DE CONTRASEÑA!
-                var verificationResult = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
+                ViewData["Mensaje"] = "Nombre de usuario o contraseña incorrectos.";
+                return View();
+            }
 
-                if (verificationResult == PasswordVerificationResult.Success)
+            bool passwordCorrecta = false;
+            bool necesitaMigracion = false;
+
+            // 🔹 1. Intentar login como texto plano
+            if (usuario.Contraseña == contraseña)
+            {
+                passwordCorrecta = true;
+                necesitaMigracion = true; // Se debe migrar el password
+            }
+            else
+            {
+                // 🔹 2. Intentar login usando HASH
+                var result = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
+                if (result == PasswordVerificationResult.Success)
                 {
-                    // 3. Verificamos si el usuario está activo
-                    if (usuario.Activo != true)
-                    {
-                        ViewData["Mensaje"] = "Su cuenta está desactivada.";
-                        return View();
-                    }
-                    var paciente = await _context.Pacientes.FirstOrDefaultAsync(d => d.IdUsuario == usuario.IdUsuario);
-
-                    // 4. Creamos la "Identidad" (la credencial) del usuario
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                        new Claim(ClaimTypes.GivenName, paciente.Nombre),
-                        new Claim(ClaimTypes.Email, usuario.Correo),
-                        new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
-                        // (Opcional) Aquí podrías agregar roles
-                    };
-
-                    // 5. Creamos el principal de la identidad
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    var props = new AuthenticationProperties
-                    {
-                        // ISPERSISTENT = FALSE (No la guardes en el disco duro del usuario)
-                        IsPersistent = false
-                        // No se necesita ExpiresUtc, ya que es una cookie de sesión
-                    };
-
-                    // 6. Inicia sesión en el sistema (CREA LA COOKIE)
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity),
-                            props);
-
-                    // 7. Redirigimos al Home
-                    return RedirectToAction("Index", "Pacientes");
+                    passwordCorrecta = true;
                 }
             }
 
-            // Si el usuario no existe O la contraseña es incorrecta
-            ViewData["Mensaje"] = "Nombre de usuario o contraseña incorrectos.";
-            return View();
+            if (!passwordCorrecta)
+            {
+                ViewData["Mensaje"] = "Nombre de usuario o contraseña incorrectos.";
+                return View();
+            }
+
+            // 🔹 3. Si requiere migración (contraseña en texto plano), convertir a HASH
+            if (necesitaMigracion)
+            {
+                usuario.Contraseña = _passwordHasher.HashPassword(usuario, contraseña);
+                _context.Usuarios.Update(usuario);
+                await _context.SaveChangesAsync();
+            }
+
+            // 🔹 4. Verificar si la cuenta está activa
+            if ((bool)!usuario.Activo)
+            {
+                ViewData["Mensaje"] = "Su cuenta está desactivada.";
+                return View();
+            }
+
+            var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == usuario.IdUsuario);
+
+            // 🔹 5. Crear Claims
+            var claims = new List<Claim>
+            {
+                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
+                new Claim(ClaimTypes.Email, usuario.Correo),
+                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
+            };
+
+            if (paciente != null)
+                claims.Add(new Claim(ClaimTypes.GivenName, paciente.Nombre));
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity)
+            );
+
+            return RedirectToAction("Index", "Pacientes");
         }
+        //cerrar sesion
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Login", "Acceso");
+        }
+
     }
 }
