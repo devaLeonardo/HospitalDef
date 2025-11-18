@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HospitalDef.Models;
 
@@ -12,6 +13,8 @@ public partial class Usuario
     public string Contraseña { get; set; } = null!;
 
     public string NombreUsuario { get; set; } = null!;
+    [Required]
+    [RegularExpression(@"^\d+$", ErrorMessage = "El teléfono solo debe contener números.")]
 
     public string Telefono { get; set; } = null!;
 

@@ -19,7 +19,7 @@ namespace HospitalDef.Controllers
             _passwordHasher = passwordHasher;
         }
 
-        // --- ACCIÓN PARA MOSTRAR LA VISTA DE LOGIN ---
+        // ACCIÓN PARA MOSTRAR LA VISTA DE LOGIN 
         [HttpGet]
         public IActionResult Login()
         {
@@ -30,12 +30,27 @@ namespace HospitalDef.Controllers
             return View();
         }
 
-        // --- ACCIÓN PARA PROCESAR EL FORMULARIO DE LOGIN ---
+        // ACCIÓN PARA PROCESAR EL FORMULARIO DE LOGIN
         [HttpPost]
         public async Task<IActionResult> Login(string nombreUsuario, string contraseña)
         {
-            var usuario = await _context.Usuarios
+            var usuario = await _context.Usuarios//evita inyecciones sql
                 .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+
+
+            //validacion para no enviar formulario vacio
+            if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contraseña))
+            {
+                ViewData["Mensaje"] = "Todos los campos son obligatorios.";
+                return View();
+            }
+
+            // Validación básica para evitar payload extraño (aunque EF lo parametriza),ya sea ; o ' evitando inyecciones
+            if (nombreUsuario.Contains("'") || nombreUsuario.Contains(";") || nombreUsuario.Length > 50)
+            {
+                ViewData["Mensaje"] = "Nombre de usuario inválido.";
+                return View();
+            }
 
             if (usuario == null)
             {
@@ -46,15 +61,15 @@ namespace HospitalDef.Controllers
             bool passwordCorrecta = false;
             bool necesitaMigracion = false;
 
-            // 🔹 1. Intentar login como texto plano
+            // 1. Intentar login como texto plano
             if (usuario.Contraseña == contraseña)
             {
                 passwordCorrecta = true;
-                necesitaMigracion = true; // Se debe migrar el password
+                necesitaMigracion = true; // Se debe migrar la contraseña
             }
             else
             {
-                // 🔹 2. Intentar login usando HASH
+                //2. Intentar login usando HASH
                 var result = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
                 if (result == PasswordVerificationResult.Success)
                 {
@@ -68,7 +83,7 @@ namespace HospitalDef.Controllers
                 return View();
             }
 
-            // 🔹 3. Si requiere migración (contraseña en texto plano), convertir a HASH
+            //3. Si requiere migración (contraseña en texto plano), convertir a HASH, esta´parte convierte la antigua contraseña a hash
             if (necesitaMigracion)
             {
                 usuario.Contraseña = _passwordHasher.HashPassword(usuario, contraseña);
@@ -76,7 +91,7 @@ namespace HospitalDef.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // 🔹 4. Verificar si la cuenta está activa
+            //4. Verificar si la cuenta está activa
             if ((bool)!usuario.Activo)
             {
                 ViewData["Mensaje"] = "Su cuenta está desactivada.";
@@ -85,10 +100,10 @@ namespace HospitalDef.Controllers
 
             var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == usuario.IdUsuario);
 
-            // 🔹 5. Crear Claims
+            //5. Crear Claims, un claim es un objeto de tipo claim que sirve para describirlo, en este caso a nuestro usuario ya verificado
             var claims = new List<Claim>
             {
-                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
+                new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Email, usuario.Correo),
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
             };

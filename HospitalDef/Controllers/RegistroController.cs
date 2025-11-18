@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using HospitalDef.Models;
-using Microsoft.AspNetCore.Identity; // Para IPasswordHasher
+using Microsoft.AspNetCore.Identity; // Para el hashseo de las contraseñas
 using Microsoft.EntityFrameworkCore; // Para FirstOrDefaultAsync
 
 namespace HospitalDef.Controllers
@@ -31,8 +31,8 @@ namespace HospitalDef.Controllers
         [HttpPost]
         public async Task<IActionResult> Registrar(string correo, string nombreUsuario, string telefono, string contraseña)
         {
-            // (Validación simple: verificar que el correo o usuario no existan)
-            if (await _context.Usuarios.AnyAsync(u => u.Correo == correo))
+            // Validación simple: verificar que el correo o usuario no existan
+            if (await _context.Usuarios.AnyAsync(u => u.Correo == correo))//esta linea evita inyecciones sql
             {
                 ViewData["Mensaje"] = $"El correo {correo} ya está registrado.";
                 return View();
@@ -43,6 +43,31 @@ namespace HospitalDef.Controllers
                 return View();
             }
 
+
+            //valirdar que el formulario este vacio
+            if (string.IsNullOrWhiteSpace(correo) ||
+                 string.IsNullOrWhiteSpace(nombreUsuario) ||
+                 string.IsNullOrWhiteSpace(telefono) ||
+                 string.IsNullOrWhiteSpace(contraseña))
+            {
+                ViewData["Mensaje"] = "Todos los campos son obligatorios.";
+                return View();
+            }
+
+            // Validar formato de correo
+            if (!correo.Contains("@") || !correo.Contains("."))
+            {
+                ViewData["Mensaje"] = "El formato del correo no es válido.";
+                return View();
+            }
+            // Validar que teléfono solo tenga números
+            if (string.IsNullOrEmpty(telefono) || !telefono.All(char.IsDigit))
+            {
+                ViewData["Mensaje"] = "El teléfono solo puede contener números.";
+                return View();
+            }
+
+
             var nuevoUsuario = new Usuario
             {
                 Correo = correo,
@@ -52,7 +77,7 @@ namespace HospitalDef.Controllers
                 FechaRegistro = DateTime.Now
             };
 
-            // ¡AQUÍ SE CREA EL HASH!
+            // AQUI SE HACE EL HASH DE LAS CONTRASEÑAS NUEVAS
             nuevoUsuario.Contraseña = _passwordHasher.HashPassword(nuevoUsuario, contraseña);
 
             _context.Usuarios.Add(nuevoUsuario);

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -23,6 +24,7 @@ namespace HospitalDef.Controllers
         {
             var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation).Include(c => c.IdPacienteNavigation);
             return View(await hospitalContext.ToListAsync());
+
         }
 
         // GET: Citas/Details/5
@@ -48,12 +50,35 @@ namespace HospitalDef.Controllers
         // GET: Citas/Create
         public IActionResult Create()
         {
-            var especialidades = _context.Especialidades;
+
             ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "Nombre");
-            ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");  
-            
-            return View();
+            // Id del usuario loggeado
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
+
+            // Buscar al paciente relacionado con este usuario
+            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == int.Parse(userId));
+
+            if (paciente == null)
+                return BadRequest("No se encontró el paciente del usuario logueado.");
+
+            // pasar el paciente fijo
+            ViewBag.PacienteNombre = paciente.Nombre;
+            ViewBag.PacienteId = paciente.IdPaciente;
+
+            var especialidades = _context.Especialidades;
+            ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
+
+            var cita = new Cita
+            {
+                fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
+            };
+
+            CargarCombos(cita);
+
+            return View(cita);
         }
 
 
@@ -66,7 +91,7 @@ namespace HospitalDef.Controllers
                                             .Select(d => new SelectListItem
                                             {
                                                 Value = d.IdDoctor.ToString(),
-                                                Text =(d.IdEmpleadoNavigation.Nombre + " " + d.IdEmpleadoNavigation.ApellidoP)
+                                                Text = (d.IdEmpleadoNavigation.Nombre + " " + d.IdEmpleadoNavigation.ApellidoP)
                                             })
                                             .ToList();
 
@@ -75,13 +100,22 @@ namespace HospitalDef.Controllers
         }
 
         // POST: Citas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cita cita)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == int.Parse(userId));
 
+            if (paciente == null)
+                return BadRequest("No se encontró el paciente del usuario logeado.");
+
+            // Fijar SIEMPRE el paciente
+            cita.idPaciente = paciente.IdPaciente;
+
+            // Si la fecha viene sin valor (cuando falla validación)
+            if (cita.fechaCita == default)
+                cita.fechaCita = DateTime.Today;
 
             cita.fechaCreacionCita = DateTime.Now;
             cita.estatusAtencion = "Agendada pendiente de pago";
@@ -89,194 +123,136 @@ namespace HospitalDef.Controllers
             cita.horaInicio = cita.horaCita;
             cita.horaTermino = cita.horaInicio.Add(TimeSpan.FromMinutes(60));
 
-            ModelState.Clear(); 
+            ModelState.Clear();
             TryValidateModel(cita);
-           
+
             DateTime inicioCita = cita.fechaCita;
             DateTime finCita = inicioCita.AddMinutes(60);
-
 
             DateTime ahora = DateTime.Now;
             TimeSpan anticipacionMinima = TimeSpan.FromHours(48);
             DateTime fechaMaxima = ahora.AddMonths(3);
 
+            // --- VALIDACIONES ----------------------
 
-            
-
-            // --- VALIDACIÓN DE FECHA PASADA Y ANTICIPACIÓN ---
             if (inicioCita < ahora)
-            {
                 ModelState.AddModelError("FechaCita", "No se puede solicitar una cita con fecha y hora pasadas.");
-            }
 
             if (inicioCita.Date == ahora.Date)
-            {
-                ModelState.AddModelError("FechaCita", "No se puede solicitar una de hoy para hoy.");
-            }
+                ModelState.AddModelError("FechaCita", "No se puede solicitar una cita de hoy para hoy.");
 
             if (inicioCita - ahora < anticipacionMinima)
-            {
                 ModelState.AddModelError("FechaCita", "La cita debe agendarse con al menos 48 horas de anticipación.");
-            }
 
             if (inicioCita.Date > fechaMaxima.Date)
-            {
                 ModelState.AddModelError("FechaCita", "Las citas solo pueden agendarse con un máximo de 3 meses.");
-            }
 
+            // SI FALLA, recargar combos y paciente
             if (!ModelState.IsValid)
             {
-                var especialidades = _context.Especialidades;
-                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "Nombre");
-                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
-
+                CargarCombos(cita);
                 return View(cita);
             }
 
-
-            string[] estatusActivos = new[] {
-                    "Agendada pendiente de pago",
-                    "Pagada pendiente por atender"
-                };
+            // Validar citas pendientes
+            string[] estatusActivos = {
+                "Agendada pendiente de pago",
+                "Pagada pendiente por atender"
+            };
 
             var citaPendiente = await _context.Citas
                 .Where(c => c.idPaciente == cita.idPaciente &&
                             c.idDoctor == cita.idDoctor &&
-                            estatusActivos.Contains(c.estatusAtencion)
-                )
+                            estatusActivos.Contains(c.estatusAtencion))
                 .FirstOrDefaultAsync();
 
             if (citaPendiente != null)
-            {
-                ModelState.AddModelError("FechaCita", "Ya tienes una cita pendiente (agendada o pagada) con este doctor. ¡Termina esa primero!");
-            }
+                ModelState.AddModelError("FechaCita", "Ya tienes una cita pendiente con este doctor.");
 
             if (!ModelState.IsValid)
             {
-                var especialidades = _context.Especialidades;
-                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "Nombre");
-                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
-
+                CargarCombos(cita);
                 return View(cita);
             }
 
-
-            // para ver si el doctor chambea en el horario que se agarro
-
+            // Validar horario del doctor
             var doctor = await _context.Doctors.FindAsync(cita.idDoctor);
             var doctorBien = await _context.Empleados.FindAsync(doctor.IdEmpleado);
-            int doctorHorario = (int) doctorBien.IdHorario;
+            int doctorHorario = (int)doctorBien.IdHorario;
 
             TimeSpan horaInicioRequerida = inicioCita.TimeOfDay;
             DayOfWeek diaSemana = inicioCita.DayOfWeek;
-            bool horarioValido = false; // Bandera
+            bool horarioValido = false;
 
-            //horario de la mañana
             if (doctorHorario == 1)
             {
-                TimeSpan inicioTurno = new TimeSpan(8, 0, 0);  // 08:00
-                TimeSpan finTurno = new TimeSpan(16, 0, 0);   // 16:00
+                TimeSpan inicioTurno = new TimeSpan(8, 0, 0);
+                TimeSpan finTurno = new TimeSpan(16, 0, 0);
 
                 if (diaSemana >= DayOfWeek.Monday && diaSemana <= DayOfWeek.Friday &&
                     horaInicioRequerida >= inicioTurno && horaInicioRequerida < finTurno)
-                {
                     horarioValido = true;
-                }
             }
             else if (doctorHorario == 2)
             {
-                TimeSpan inicioTurno = new TimeSpan(16, 0, 0); // 16:00
-                TimeSpan finTurno = new TimeSpan(22, 0, 0);   // 22:00
+                TimeSpan inicioTurno = new TimeSpan(16, 0, 0);
+                TimeSpan finTurno = new TimeSpan(22, 0, 0);
 
-                // Debe ser un día entre Lunes y Viernes, Y la hora debe estar dentro del rango
                 if (diaSemana >= DayOfWeek.Monday && diaSemana <= DayOfWeek.Friday &&
                     horaInicioRequerida >= inicioTurno && horaInicioRequerida < finTurno)
-                {
                     horarioValido = true;
-                }
             }
             else if (doctorHorario == 3)
             {
-                TimeSpan inicioTurno = new TimeSpan(10, 0, 0);  // 10:00
-                TimeSpan finTurno = new TimeSpan(17, 0, 0);   // 17:00
+                TimeSpan inicioTurno = new TimeSpan(10, 0, 0);
+                TimeSpan finTurno = new TimeSpan(17, 0, 0);
+
                 if ((diaSemana == DayOfWeek.Saturday || diaSemana == DayOfWeek.Sunday) &&
                     horaInicioRequerida >= inicioTurno && horaInicioRequerida < finTurno)
-                {
                     horarioValido = true;
-                }
             }
 
             if (!horarioValido)
-            {
-                ModelState.AddModelError("FechaCita", $"El horario seleccionado no es válido. El doctor trabaja en el turno '{doctorHorario}' (ej: Mañana es de 9:00 a 14:00 de Lunes a Viernes).");
-            }
+                ModelState.AddModelError("FechaCita", $"El horario seleccionado no es válido para este doctor.");
 
             if (!ModelState.IsValid)
             {
-                var especialidades = _context.Especialidades;
-                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "Nombre");
-                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
-
+                CargarCombos(cita);
                 return View(cita);
             }
 
+            // Validar encimado de citas
+            var citasDelDoctor = await _context.Citas
+                .Where(c =>
+                    c.idDoctor == cita.idDoctor &&
+                    (c.estatusAtencion == "Agendada pendiente de pago" ||
+                     c.estatusAtencion == "Pagada pendiente por atender"))
+                .ToListAsync();
 
-            //para que no se encimen las citas
-                    var citasDelDoctor = await _context.Citas
-             .Where(c =>
-                 c.idDoctor == cita.idDoctor &&
-                 (c.estatusAtencion == "Agendada pendiente de pago" ||
-                  c.estatusAtencion == "Pagada pendiente por atender")
-             )
-             .ToListAsync(); // <-- Aquí EF ya no necesita traducir nada raro
-
-                    var citaEncimada = citasDelDoctor
-                        .FirstOrDefault(otraCita =>
-                            inicioCita < otraCita.fechaCita.Add(otraCita.horaTermino) &&
-                            finCita > otraCita.fechaCita.Add(otraCita.horaInicio)
-                        );
-
+            var citaEncimada = citasDelDoctor
+                .FirstOrDefault(otra =>
+                    inicioCita < otra.fechaCita.Add(otra.horaTermino) &&
+                    finCita > otra.fechaCita.Add(otra.horaInicio));
 
             if (citaEncimada != null)
-            {
-                ModelState.AddModelError("FechaCita", "El doctor ya tiene una cita agendada o pendiente de pago que se solapa con el horario seleccionado. Intenta otra hora.");
-            }
+                ModelState.AddModelError("FechaCita", "El doctor ya tiene una cita en ese horario.");
+
             if (!ModelState.IsValid)
             {
-                var especialidades = _context.Especialidades;
-                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-                ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "Nombre");
-                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
-
+                CargarCombos(cita);
                 return View(cita);
             }
 
-           
-
-
-
-
+            // Guardar en la base de datos los cambios
             _context.Add(cita);
             await _context.SaveChangesAsync();
 
-            //Ya para este punto la cita ya esta creada aqui podriamos mandarlo a otra pagina que diga no se
-            // tu cita fue agendad exitosamente
-
-
             return RedirectToAction("Index", "Citas");
-        }       
+        }
 
 
 
-
-
-
-
-
-            // GET: Citas/Edit/5
+        // GET: Citas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -370,5 +346,45 @@ namespace HospitalDef.Controllers
         {
             return _context.Citas.Any(e => e.FolioCitas == id);
         }
+
+
+        //metodo para recargar las citas y se mantengan guardados
+        private void CargarCombos(Cita cita)
+        {
+            // Especialidades
+            ViewBag.Especialidades = new SelectList(
+                _context.Especialidades,
+                "IdEspecialidad",
+                "Especialidades",
+                cita.EspecialidadIdFiltro
+            );
+
+            // Doctores filtrados por especialidad
+            var doctoresFiltrados = _context.Doctors
+                .Where(d => d.IdEspecialidad == cita.EspecialidadIdFiltro)
+                .Include(d => d.IdEmpleadoNavigation)
+                .Select(d => new SelectListItem
+                {
+                    Value = d.IdDoctor.ToString(),
+                    Text = d.IdEmpleadoNavigation.Nombre + " " + d.IdEmpleadoNavigation.ApellidoP
+                })
+                .ToList();
+
+            ViewBag.Doctores = new SelectList(
+                doctoresFiltrados,
+                "Value",
+                "Text",
+                cita.idDoctor
+            );
+
+            // PACIENTE LOGGEADO
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == int.Parse(userId));
+
+            ViewBag.PacienteNombre = paciente?.Nombre;
+            ViewBag.PacienteId = paciente?.IdPaciente;
+        }
+
     }
+
 }
