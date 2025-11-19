@@ -22,8 +22,19 @@ namespace HospitalDef.Controllers
         // GET: Citas
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation).Include(c => c.IdPacienteNavigation);
-            return View(await hospitalContext.ToListAsync());
+            if (User.Identity.IsAuthenticated)
+            {
+                var paciente = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+                var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation).Include(c => c.IdPacienteNavigation).Where(c => c.idPaciente.ToString() == paciente);
+                return View(await hospitalContext.ToListAsync());
+
+
+            }
+            else
+            {
+                return View();
+            }
+
 
         }
 

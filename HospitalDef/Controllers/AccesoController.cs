@@ -83,7 +83,6 @@ namespace HospitalDef.Controllers
                 return View();
             }
 
-            //3. Si requiere migración (contraseña en texto plano), convertir a HASH, esta´parte convierte la antigua contraseña a hash
             if (necesitaMigracion)
             {
                 usuario.Contraseña = _passwordHasher.HashPassword(usuario, contraseña);
@@ -91,7 +90,6 @@ namespace HospitalDef.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            //4. Verificar si la cuenta está activa
             if ((bool)!usuario.Activo)
             {
                 ViewData["Mensaje"] = "Su cuenta está desactivada.";
@@ -108,17 +106,36 @@ namespace HospitalDef.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
             };
 
-            if (paciente != null)
+            if (paciente != null) { 
                 claims.Add(new Claim(ClaimTypes.GivenName, paciente.Nombre));
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity)
             );
 
-            return RedirectToAction("Index", "Pacientes");
+                return RedirectToAction("Index", "Pacientes");
+
+            }
+            else
+            {
+                    var claims2 = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, usuario.NombreUsuario),
+                    new Claim(ClaimTypes.Email, usuario.Correo),
+                    new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
+                };
+          
+                    var identity = new ClaimsIdentity(claims2, CookieAuthenticationDefaults.AuthenticationScheme);
+                    await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity)
+                );
+                    return RedirectToAction("Create", "Pacientes");
+                
+            }
+
+
         }
         //cerrar sesion
         [HttpPost]

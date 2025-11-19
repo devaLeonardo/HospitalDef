@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -47,7 +48,11 @@ namespace HospitalDef.Controllers
         // GET: Pacientes/Create
         public IActionResult Create()
         {
-            ViewData["IdUsuario"] = new SelectList(_context.Usuarios, "IdUsuario", "IdUsuario");
+           
+
+            ViewBag.PacienteId = new SelectList(_context.Usuarios,"IdUsuario","NombreUsuario");
+
+
             return View();
         }
 
@@ -56,16 +61,17 @@ namespace HospitalDef.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdPaciente,IdUsuario,Nombre,ApellidoP,ApellidoM,FechaNacimiento,Sexo,Edad,Calle,Colonia,Municipio,Estado")] Paciente paciente)
+        public async Task<IActionResult> Create(Paciente paciente)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(paciente);
+
+            ModelState.Clear();
+            TryValidateModel(paciente);
+
+            _context.Add(paciente);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdUsuario"] = new SelectList(_context.Usuarios, "IdUsuario", "IdUsuario", paciente.IdUsuario);
-            return View(paciente);
+                return RedirectToAction("Login", "Acceso");
+
+          
         }
 
         // GET: Pacientes/Edit/5
