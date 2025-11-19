@@ -30,12 +30,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.estatusAtencion)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdDoctorNavigation)
+            <th> Doctor
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdPacienteNavigation)
-            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -63,14 +60,20 @@
             <td>
                 @Html.DisplayFor(modelItem => item.IdDoctorNavigation.IdDoctor)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdPacienteNavigation.IdPaciente)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.FolioCitas">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.FolioCitas">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.FolioCitas">Delete</a>
-            </td>
+
+                <td class="align-middle text-nowrap">
+                    <a asp-action="Edit" asp-route-id="@item.FolioCitas" class="btn btn-success btn-sm fw-bold shadow-sm">
+                        <i class="fas fa-credit-card me-1"></i> Pagar
+                    </a>
+
+                    <a asp-action="Details" asp-route-id="@item.FolioCitas" class="btn btn-outline-secondary btn-sm ms-1" title="Ver detalles">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+
+                    <a asp-action="Delete" asp-route-id="@item.FolioCitas" class="btn btn-outline-danger btn-sm ms-1" title="Cancelar Cita">
+                        <i class="fas fa-ban"></i>
+                    </a>
+                </td>
         </tr>
 }
     </tbody>

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -48,6 +49,7 @@ namespace HospitalDef.Controllers
         public IActionResult Create()
         {
             ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+
             return View();
         }
 
@@ -62,7 +64,8 @@ namespace HospitalDef.Controllers
             {
                 _context.Add(historialMedicoPaciente);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await HttpContext.SignOutAsync();
+                return RedirectToAction("Login","Acceso");
             }
             ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
             return View(historialMedicoPaciente);

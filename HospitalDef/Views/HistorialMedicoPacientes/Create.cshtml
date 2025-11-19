@@ -1,57 +1,90 @@
 ﻿@model HospitalDef.Models.HistorialMedicoPaciente
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Historial Médico";
 }
 
-<h1>Create</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0 font-weight-bold">Nuevo Historial Clínico</h4>
+                </div>
 
-<h4>HistorialMedicoPaciente</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdPaciente" class="control-label"></label>
-                <select asp-for="IdPaciente" class ="form-control" asp-items="ViewBag.IdPaciente"></select>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="IdPaciente" class="form-label fw-bold">Seleccionar Paciente</label>
+                            <select asp-for="IdPaciente" class="form-control form-select-lg" asp-items="ViewBag.IdPaciente">
+                                <option value="">-- Buscar Paciente en Base de Datos --</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="text-muted mb-3">Datos Físicos y Biométricos</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Peso" class="form-label">Peso</label>
+                                <div class="input-group">
+                                    <input asp-for="Peso" class="form-control" placeholder="0.00" />
+                                    <span class="input-group-text bg-light">kg</span>
+                                </div>
+                                <span asp-validation-for="Peso" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Altura" class="form-label">Altura</label>
+                                <div class="input-group">
+                                    <input asp-for="Altura" class="form-control" placeholder="0.00" />
+                                    <span class="input-group-text bg-light">m/cm</span>
+                                </div>
+                                <span asp-validation-for="Altura" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TipoSangre" class="form-label">Tipo de Sangre</label>
+                                <input asp-for="TipoSangre" class="form-control" placeholder="Ej. O+, A-" />
+                                <span asp-validation-for="TipoSangre" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="text-muted mb-3 mt-2">Antecedentes Médicos</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Alergias" class="form-label">Alergias</label>
+                                <textarea asp-for="Alergias" class="form-control" rows="3" placeholder="Listar alergias a medicamentos, alimentos, etc."></textarea>
+                                <span asp-validation-for="Alergias" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Padecimientos" class="form-label">Padecimientos Crónicos</label>
+                                <textarea asp-for="Padecimientos" class="form-control" rows="3" placeholder="Diabetes, Hipertensión, Asma, etc."></textarea>
+                                <span asp-validation-for="Padecimientos" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a class="btn btn-outline-secondary">
+                                <i class="fa fa-arrow-left"></i> Regresar
+                            </a>
+                            <input type="submit" value="Guardar Historial" class="btn btn-info text-white btn-lg px-5" />
+                        </div>
+
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Peso" class="control-label"></label>
-                <input asp-for="Peso" class="form-control" />
-                <span asp-validation-for="Peso" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Altura" class="control-label"></label>
-                <input asp-for="Altura" class="form-control" />
-                <span asp-validation-for="Altura" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Alergias" class="control-label"></label>
-                <input asp-for="Alergias" class="form-control" />
-                <span asp-validation-for="Alergias" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TipoSangre" class="control-label"></label>
-                <input asp-for="TipoSangre" class="form-control" />
-                <span asp-validation-for="TipoSangre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Padecimientos" class="control-label"></label>
-                <input asp-for="Padecimientos" class="form-control" />
-                <span asp-validation-for="Padecimientos" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

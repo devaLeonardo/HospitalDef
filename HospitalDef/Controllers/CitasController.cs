@@ -25,7 +25,7 @@ namespace HospitalDef.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var paciente = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
-                var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation).Include(c => c.IdPacienteNavigation).Where(c => c.idPaciente.ToString() == paciente);
+                var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation);
                 return View(await hospitalContext.ToListAsync());
 
 

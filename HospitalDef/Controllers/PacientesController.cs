@@ -1,4 +1,5 @@
 ﻿using HospitalDef.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -59,20 +60,34 @@ namespace HospitalDef.Controllers
         // POST: Pacientes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Paciente paciente)
-        {
 
-            ModelState.Clear();
-            TryValidateModel(paciente);
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+            public async Task<IActionResult> Create(Paciente paciente)
+            {
+                // 1. Verificar si los datos cumplen las reglas (Strings no nulos, fechas válidas, etc.)
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Add(paciente);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("Create", "HistorialMedicoPacientes");
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", "No se pudo guardar los cambios. " + ex.Message);
+                    }
+                }
 
-            _context.Add(paciente);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Login", "Acceso");
+                ViewBag.PacienteId = new SelectList(_context.Usuarios, "IdUsuario", "NombreUsuario", paciente.IdUsuario);
 
-          
-        }
+                // Regresamos a la vista para que el usuario corrija los errores
+                return View(paciente);
+            }
+
+
+        
 
         // GET: Pacientes/Edit/5
         public async Task<IActionResult> Edit(int? id)

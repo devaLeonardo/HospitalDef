@@ -1,87 +1,115 @@
 ﻿@model HospitalDef.Models.Paciente
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Registro";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="font-weight-light my-2">Registrate como paciente</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-<h4>Paciente</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdUsuario" class="control-label"></label>
-                <select asp-for="IdUsuario" class="form-control" asp-items="ViewBag.PacienteId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApellidoP" class="control-label"></label>
-                <input asp-for="ApellidoP" class="form-control" />
-                <span asp-validation-for="ApellidoP" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApellidoM" class="control-label"></label>
-                <input asp-for="ApellidoM" class="form-control" />
-                <span asp-validation-for="ApellidoM" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaNacimiento" class="control-label"></label>
-                <input asp-for="FechaNacimiento" class="form-control" type ="date"/>
-                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Sexo" class="control-label"></label>
+                        <h5 class="text-primary mb-3 border-bottom pb-2">Datos Personales</h5>
 
-                <select asp-for="Sexo" class="form-control">
-                    <option value="">-- Seleccione el Sexo --</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                </select>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="IdUsuario" class="form-label fw-bold">Usuario de Sistema (Opcional)</label>
+                                <select asp-for="IdUsuario" class="form-select form-control" asp-items="ViewBag.PacienteId">
+                                    <option value="">-- Seleccione un Usuario (Si aplica) --</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <span asp-validation-for="Sexo" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Nombre" class="form-label">Nombre</label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej. Juan" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ApellidoP" class="form-label">Apellido Paterno</label>
+                                <input asp-for="ApellidoP" class="form-control" placeholder="Ej. Pérez" />
+                                <span asp-validation-for="ApellidoP" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ApellidoM" class="form-label">Apellido Materno</label>
+                                <input asp-for="ApellidoM" class="form-control" placeholder="Ej. López" />
+                                <span asp-validation-for="ApellidoM" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Edad" class="form-label">Edad</label>
+                                <input asp-for="Edad" class="form-control" type="number" placeholder="Calculada o manual" />
+                                <span asp-validation-for="Edad" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Sexo" class="form-label">Sexo</label>
+                                <select asp-for="Sexo" class="form-select form-control">
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                </select>
+                                <span asp-validation-for="Sexo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="text-primary mt-4 mb-3 border-bottom pb-2">Domicilio</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Calle" class="form-label">Calle y Número</label>
+                                <input asp-for="Calle" class="form-control" placeholder="Av. Reforma #123" />
+                                <span asp-validation-for="Calle" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Colonia" class="form-label">Colonia</label>
+                                <input asp-for="Colonia" class="form-control" />
+                                <span asp-validation-for="Colonia" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Municipio" class="form-label">Municipio</label>
+                                <input asp-for="Municipio" class="form-control" />
+                                <span asp-validation-for="Municipio" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Estado" class="form-label">Estado</label>
+                                <input asp-for="Estado" class="form-control" />
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Volver a la lista
+                            </a>
+                            <input type="submit" value="Guardar tu registro" class="btn btn-success btn-lg px-5" />
+                        </div>
+
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Edad" class="control-label"></label>
-                <input asp-for="Edad" class="form-control" />
-                <span asp-validation-for="Edad" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Calle" class="control-label"></label>
-                <input asp-for="Calle" class="form-control" />
-                <span asp-validation-for="Calle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Colonia" class="control-label"></label>
-                <input asp-for="Colonia" class="form-control" />
-                <span asp-validation-for="Colonia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Municipio" class="control-label"></label>
-                <input asp-for="Municipio" class="form-control" />
-                <span asp-validation-for="Municipio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <br/>
-            <br />
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" asp-action="Index" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
