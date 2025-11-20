@@ -4,10 +4,10 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Datos medicos</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Actualizar tus datos</a>
 </p>
 <table class="table">
     <thead>
@@ -72,3 +72,6 @@
 }
     </tbody>
 </table>
+<div class="text-center mt-3">
+    <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary">Regresar</a>
+</div>

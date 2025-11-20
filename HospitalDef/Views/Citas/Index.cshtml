@@ -4,10 +4,11 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Tus citas</h1>
+
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Agendar Cita</a>
 </p>
 <table class="table">
     <thead>
@@ -57,14 +58,22 @@
             <td>
                 @Html.DisplayFor(modelItem => item.estatusAtencion)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdDoctorNavigation.IdDoctor)
-            </td>
+                <td>
+                    @($"{item.IdDoctorNavigation.IdEmpleadoNavigation.Nombre} {item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoP} {item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoM}")
+                    <br />
+                    <small class="text-muted">
+                        @item.IdDoctorNavigation.IdEspecialidadNavigation.Especialidades
+                    </small>
+                </td>
+
+
 
                 <td class="align-middle text-nowrap">
-                    <a asp-action="Edit" asp-route-id="@item.FolioCitas" class="btn btn-success btn-sm fw-bold shadow-sm">
+
+
+                    <button class="btn btn-success btn-sm fw-bold shadow-sm pagar-btn" data-id="@item.FolioCitas">
                         <i class="fas fa-credit-card me-1"></i> Pagar
-                    </a>
+                    </button>
 
                     <a asp-action="Details" asp-route-id="@item.FolioCitas" class="btn btn-outline-secondary btn-sm ms-1" title="Ver detalles">
                         <i class="fas fa-info-circle"></i>
@@ -78,3 +87,15 @@
 }
     </tbody>
 </table>
+<div class="text-center mt-3">
+    <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary">Regresar</a>
+</div>
+<div id="alertaPago" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+    <span id="mensajePago"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+}

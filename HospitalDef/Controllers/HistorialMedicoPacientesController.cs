@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
@@ -48,7 +49,24 @@ namespace HospitalDef.Controllers
         // GET: HistorialMedicoPacientes/Create
         public IActionResult Create()
         {
-            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente");
+            // Obtener Id del usuario loggeado
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
+
+            int idUsuario = int.Parse(userId);
+
+            // Buscar el PACIENTE asociado al usuario
+            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == idUsuario);
+
+            if (paciente == null)
+                return BadRequest("No se encontró un paciente asociado al usuario logueado.");
+
+            // Enviar IdPaciente a la vista
+            ViewBag.IdPaciente = paciente.IdPaciente;
+            ViewBag.NombrePaciente = paciente.Nombre + " " + paciente.ApellidoP;
+
 
             return View();
         }
@@ -67,7 +85,18 @@ namespace HospitalDef.Controllers
                 await HttpContext.SignOutAsync();
                 return RedirectToAction("Login","Acceso");
             }
-            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
+            // Recargar PACIENTE para que no se borre al fallar validación
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int idUsuario = int.Parse(userId);
+
+            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == idUsuario);
+
+            if (paciente != null)
+            {
+                historialMedicoPaciente.IdPaciente = paciente.IdPaciente; // <--- IMPORTANTE
+                ViewBag.IdPaciente = paciente.IdPaciente;
+                ViewBag.NombrePaciente = paciente.Nombre + " " + paciente.ApellidoP;
+            }
             return View(historialMedicoPaciente);
         }
 
@@ -84,8 +113,20 @@ namespace HospitalDef.Controllers
             {
                 return NotFound();
             }
-            ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", historialMedicoPaciente.IdPaciente);
+            // Recargar paciente para que no se borre al fallar validación
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int idUsuario = int.Parse(userId);
+
+            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == idUsuario);
+
+            if (paciente != null)
+            {
+                ViewBag.IdPaciente = paciente.IdPaciente;
+                ViewBag.NombrePaciente = paciente.Nombre + " " + paciente.ApellidoP;
+            }
+
             return View(historialMedicoPaciente);
+
         }
 
         // POST: HistorialMedicoPacientes/Edit/5

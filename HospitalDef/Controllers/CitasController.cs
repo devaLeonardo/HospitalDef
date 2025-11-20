@@ -22,18 +22,31 @@ namespace HospitalDef.Controllers
         // GET: Citas
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                var paciente = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
-                var hospitalContext = _context.Citas.Include(c => c.IdDoctorNavigation);
-                return View(await hospitalContext.ToListAsync());
+            if (!User.Identity.IsAuthenticated)
+                return View(new List<Cita>());
 
+            // ID del usuario logueado
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            }
-            else
-            {
-                return View();
-            }
+            // Obtener al paciente relacionado al usuario
+            var paciente = await _context.Pacientes
+                .FirstOrDefaultAsync(p => p.IdUsuario == userId);
+
+            if (paciente == null)
+                return BadRequest("No se encontró el paciente asociado a este usuario.");
+
+            // Cargar las citas del paciente, incluyendo:
+            // - Doctor
+            // - Empleado (nombre del doctor)
+            // - Especialidad del doctor
+            var citas = await _context.Citas
+                .Where(c => c.idPaciente == paciente.IdPaciente)
+                .Include(c => c.IdDoctorNavigation)
+                    .ThenInclude(d => d.IdEmpleadoNavigation)
+                .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
+                .ToListAsync();
+
+            return View(citas);
 
 
         }
@@ -162,6 +175,8 @@ namespace HospitalDef.Controllers
             if (!ModelState.IsValid)
             {
                 CargarCombos(cita);
+                if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
                 return View(cita);
             }
 
@@ -183,6 +198,8 @@ namespace HospitalDef.Controllers
             if (!ModelState.IsValid)
             {
                 CargarCombos(cita);
+                if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
                 return View(cita);
             }
 
@@ -229,6 +246,8 @@ namespace HospitalDef.Controllers
             if (!ModelState.IsValid)
             {
                 CargarCombos(cita);
+                if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
                 return View(cita);
             }
 
@@ -251,6 +270,8 @@ namespace HospitalDef.Controllers
             if (!ModelState.IsValid)
             {
                 CargarCombos(cita);
+                if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
                 return View(cita);
             }
 
@@ -313,6 +334,7 @@ namespace HospitalDef.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor", cita.idDoctor);
             ViewData["IdPaciente"] = new SelectList(_context.Pacientes, "IdPaciente", "IdPaciente", cita.idPaciente);
             return View(cita);
@@ -357,6 +379,8 @@ namespace HospitalDef.Controllers
         {
             return _context.Citas.Any(e => e.FolioCitas == id);
         }
+       
+
 
 
         //metodo para recargar las citas y se mantengan guardados
@@ -396,6 +420,38 @@ namespace HospitalDef.Controllers
             ViewBag.PacienteId = paciente?.IdPaciente;
         }
 
+        private void CargarHorarioDoctor(int idDoctor)
+        {
+            var horario = _context.VistaDoctorHorario
+                .Where(h => h.IdDoctor == idDoctor)
+                .Select(h => new
+                {
+                    dia = h.DiaSemana,
+                    inicio = h.HoraInicio.ToString(@"hh\:mm"),
+                    fin = h.HoraFin.ToString(@"hh\:mm")
+                })
+                .ToList();
+
+            ViewBag.HorarioDoctor = horario;
+        }
+        [HttpGet]
+        public JsonResult GetHorarioDoctor(int idDoctor)
+        {
+            var horario = _context.VistaDoctorHorario
+                                  .Where(h => h.IdDoctor == idDoctor)
+                                  .Select(h => new
+                                  {
+                                      dia = h.DiaSemana,
+                                      inicio = h.HoraInicio.ToString(@"hh\:mm"),
+                                      fin = h.HoraFin.ToString(@"hh\:mm")
+                                  })
+                                  .ToList();
+
+            return Json(horario);
+        }
+
+
     }
+
 
 }

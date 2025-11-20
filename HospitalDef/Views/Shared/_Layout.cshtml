@@ -51,25 +51,25 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <div class="nav-item d-flex align-items-center ms-lg-3 ps-lg-3 border-start border-secondary my-2 my-lg-0">
+                            <div class="nav-item d-flex align-items-center ms-lg-4 ps-lg-4 border-start border-secondary gap-3">
 
-
-                                <span class="navbar-text text-primary fw-semibold me-3">
+                                <!-- Usuario -->
+                                <span class="navbar-text text-primary fw-semibold">
                                     <i class="bi bi-person-circle"></i> @User.Identity.Name
                                 </span>
 
+                                <!-- Botón TU MÓDULO  -->
                                 <a class="btn btn-outline-primary btn-sm" asp-controller="Pacientes" asp-action="Index">Tu Modulo</a>
 
-
-
-                                @*
-                                <form asp-controller="Acceso" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                <!-- Botón CERRAR SESIÓN  -->
+                                <form asp-controller="Acceso" asp-action="Logout" method="post" class="m-0">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-3">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        Cerrar Sesión
                                     </button>
-                                </form>*@
-                            </div>
+                                </form>
 
+                            </div>
                             
                         }
                         else

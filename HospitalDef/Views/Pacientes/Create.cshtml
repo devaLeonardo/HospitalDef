@@ -9,7 +9,7 @@
         <div class="col-md-10">
             <div class="card shadow-lg border-0 rounded-lg">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="font-weight-light my-2">Registrate como paciente</h3>
+                    <h3 class="font-weight-light my-2">Regístrate como paciente</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create">
@@ -17,28 +17,29 @@
 
                         <h5 class="text-primary mb-3 border-bottom pb-2">Datos Personales</h5>
 
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label asp-for="IdUsuario" class="form-label fw-bold">Usuario de Sistema (Opcional)</label>
-                                <select asp-for="IdUsuario" class="form-select form-control" asp-items="ViewBag.PacienteId">
-                                    <option value="">-- Seleccione un Usuario (Si aplica) --</option>
-                                </select>
-                            </div>
+                        <!-- ID DEL USUARIO -->
+                        <input asp-for="IdUsuario" type="hidden" value="@ViewBag.IdUsuario" />
+
+                        <div class="form-group">
+                            <label>Usuario asignado:</label>
+                            <input type="text" class="form-control" value="@ViewBag.NombreUsuario" disabled />
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label asp-for="Nombre" class="form-label">Nombre</label>
+                                <label asp-for="Nombre" class="form-label"></label>
                                 <input asp-for="Nombre" class="form-control" placeholder="Ej. Juan" />
                                 <span asp-validation-for="Nombre" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-4 mb-3">
-                                <label asp-for="ApellidoP" class="form-label">Apellido Paterno</label>
+                                <label asp-for="ApellidoP" class="form-label"></label>
                                 <input asp-for="ApellidoP" class="form-control" placeholder="Ej. Pérez" />
                                 <span asp-validation-for="ApellidoP" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-4 mb-3">
-                                <label asp-for="ApellidoM" class="form-label">Apellido Materno</label>
+                                <label asp-for="ApellidoM" class="form-label"></label>
                                 <input asp-for="ApellidoM" class="form-control" placeholder="Ej. López" />
                                 <span asp-validation-for="ApellidoM" class="text-danger"></span>
                             </div>
@@ -46,17 +47,26 @@
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label asp-for="FechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <label asp-for="FechaNacimiento" class="form-label"></label>
                                 <input asp-for="FechaNacimiento" class="form-control" type="date" />
                                 <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-4 mb-3">
-                                <label asp-for="Edad" class="form-label">Edad</label>
-                                <input asp-for="Edad" class="form-control" type="number" placeholder="Calculada o manual" />
+                                <label asp-for="Edad" class="form-label"></label>
+
+                                <!-- CAMPO SOLO LECTURA -->
+                                <input asp-for="Edad" class="form-control" type="number" readonly />
+
+                                <!-- OPCIONAL: HIDDEN PARA GARANTIZAR ENVÍO -->
+                                <input type="hidden" asp-for="Edad" />
+
+                                <small class="form-text text-muted">La edad se calcula automáticamente.</small>
                                 <span asp-validation-for="Edad" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-4 mb-3">
-                                <label asp-for="Sexo" class="form-label">Sexo</label>
+                                <label asp-for="Sexo" class="form-label"></label>
                                 <select asp-for="Sexo" class="form-select form-control">
                                     <option value="">-- Seleccionar --</option>
                                     <option value="M">Masculino</option>
@@ -70,12 +80,13 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Calle" class="form-label">Calle y Número</label>
+                                <label asp-for="Calle" class="form-label"></label>
                                 <input asp-for="Calle" class="form-control" placeholder="Av. Reforma #123" />
                                 <span asp-validation-for="Calle" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Colonia" class="form-label">Colonia</label>
+                                <label asp-for="Colonia" class="form-label"></label>
                                 <input asp-for="Colonia" class="form-control" />
                                 <span asp-validation-for="Colonia" class="text-danger"></span>
                             </div>
@@ -83,12 +94,13 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Municipio" class="form-label">Municipio</label>
+                                <label asp-for="Municipio" class="form-label"></label>
                                 <input asp-for="Municipio" class="form-control" />
                                 <span asp-validation-for="Municipio" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Estado" class="form-label">Estado</label>
+                                <label asp-for="Estado" class="form-label"></label>
                                 <input asp-for="Estado" class="form-control" />
                                 <span asp-validation-for="Estado" class="text-danger"></span>
                             </div>
@@ -112,4 +124,42 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        function calcularEdadDesdeFecha(fechaStr) {
+            if (!fechaStr) return "";
+
+            const partes = fechaStr.split('-');
+            if (partes.length !== 3) return "";
+
+            const year = parseInt(partes[0], 10);
+            const month = parseInt(partes[1], 10) - 1;
+            const day = parseInt(partes[2], 10);
+
+            const hoy = new Date();
+            const nacimiento = new Date(year, month, day);
+
+            if (isNaN(nacimiento.getTime())) return "";
+
+            let edad = hoy.getFullYear() - nacimiento.getFullYear();
+
+            const cumpleEsteAno = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+            if (hoy < cumpleEsteAno) edad--;
+
+            return edad >= 0 ? edad : "";
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaInput = document.querySelector('input[name="FechaNacimiento"]');
+            const edadInput = document.querySelector('input[name="Edad"]');
+
+            if (!fechaInput || !edadInput) return;
+
+            edadInput.value = calcularEdadDesdeFecha(fechaInput.value);
+
+            fechaInput.addEventListener('change', function () {
+                edadInput.value = calcularEdadDesdeFecha(this.value);
+            });
+        });
+    </script>
 }

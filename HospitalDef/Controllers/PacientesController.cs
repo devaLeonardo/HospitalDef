@@ -49,12 +49,28 @@ namespace HospitalDef.Controllers
         // GET: Pacientes/Create
         public IActionResult Create()
         {
-           
+            // Obtener Id del usuario loggeado desde los Claims
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.IdUsuario = userId;
 
-            ViewBag.PacienteId = new SelectList(_context.Usuarios,"IdUsuario","NombreUsuario");
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
 
+            // Convertir a int
+            int idUsuario = int.Parse(userId);
+
+            // Buscar la información del usuario (opcional si solo usas su Id)
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.IdUsuario == idUsuario);
+
+            if (usuario == null)
+                return BadRequest("No se encontró el usuario logueado.");
+
+            // Enviar datos del usuario a la vista
+            ViewBag.IdUsuario = idUsuario;
+            ViewBag.NombreUsuario = usuario.NombreUsuario;
 
             return View();
+
         }
 
         // POST: Pacientes/Create
@@ -65,26 +81,47 @@ namespace HospitalDef.Controllers
             [ValidateAntiForgeryToken]
             public async Task<IActionResult> Create(Paciente paciente)
             {
-                // 1. Verificar si los datos cumplen las reglas (Strings no nulos, fechas válidas, etc.)
-                if (ModelState.IsValid)
+            // VALIDACIONES
+            if (string.IsNullOrWhiteSpace(paciente.Nombre))
+                ModelState.AddModelError("Nombre", "El nombre es obligatorio.");
+
+            if (string.IsNullOrWhiteSpace(paciente.ApellidoP))
+                ModelState.AddModelError("ApellidoP", "El apellido paterno es obligatorio.");
+
+            if (paciente.IdUsuario <= 0)
+                ModelState.AddModelError("IdUsuario", "No se asignó un usuario válido.");
+
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+            if (paciente.FechaNacimiento == default || paciente.FechaNacimiento > hoy)
+                ModelState.AddModelError("FechaNacimiento", "La fecha de nacimiento no es válida.");
+
+            paciente.Edad = CalcularEdad(paciente.FechaNacimiento);
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    try
-                    {
-                        _context.Add(paciente);
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction("Create", "HistorialMedicoPacientes");
-                    }
-                    catch (Exception ex)
-                    {
-                        ModelState.AddModelError("", "No se pudo guardar los cambios. " + ex.Message);
-                    }
+                    _context.Add(paciente);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Create", "HistorialMedicoPacientes");
                 }
-
-                ViewBag.PacienteId = new SelectList(_context.Usuarios, "IdUsuario", "NombreUsuario", paciente.IdUsuario);
-
-                // Regresamos a la vista para que el usuario corrija los errores
-                return View(paciente);
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "No se pudo guardar los cambios. " + ex.Message);
+                }
             }
+
+            //  esto hace que no se borre el usuario por si no se cumple una validacion
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int idUsuario = int.Parse(userId);
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.IdUsuario == idUsuario);
+
+            ViewBag.IdUsuario = idUsuario;
+            ViewBag.NombreUsuario = usuario.NombreUsuario;
+         
+
+            return View(paciente);
+        }
 
 
         
@@ -114,9 +151,22 @@ namespace HospitalDef.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("IdPaciente,IdUsuario,Nombre,ApellidoP,ApellidoM,FechaNacimiento,Sexo,Edad,Calle,Colonia,Municipio,Estado")] Paciente paciente)
         {
             if (id != paciente.IdPaciente)
-            {
                 return NotFound();
+
+            // Validaciones
+            if (string.IsNullOrWhiteSpace(paciente.Nombre))
+                ModelState.AddModelError("Nombre", "El nombre es obligatorio.");
+          
+            
+            var hoy = DateOnly.FromDateTime(DateTime.Today); //convierte la fecha actual en dateonly (01/01/0001)
+
+            if (paciente.FechaNacimiento == default || paciente.FechaNacimiento > hoy)
+            {
+                ModelState.AddModelError("FechaNacimiento", "La fecha de nacimiento no es válida.");
             }
+
+            // Recalcular edad
+            paciente.Edad = CalcularEdad(paciente.FechaNacimiento);
 
             if (ModelState.IsValid)
             {
@@ -128,18 +178,15 @@ namespace HospitalDef.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!PacienteExists(paciente.IdPaciente))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdUsuario"] = new SelectList(_context.Usuarios, "IdUsuario", "IdUsuario", paciente.IdUsuario);
+           
             return View(paciente);
+            
         }
 
         // GET: Pacientes/Delete/5
@@ -179,6 +226,19 @@ namespace HospitalDef.Controllers
         private bool PacienteExists(int id)
         {
             return _context.Pacientes.Any(e => e.IdPaciente == id);
+        }
+
+        //metodo para calcular edad
+        private int CalcularEdad(DateOnly fechaNacimiento)
+        {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+            int edad = hoy.Year - fechaNacimiento.Year;
+
+            // Si aún no cumplió años este año, restar 1
+            if (fechaNacimiento > hoy.AddYears(-edad))
+                edad--;
+
+            return edad;
         }
     }
 }
