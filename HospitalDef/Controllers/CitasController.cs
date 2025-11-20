@@ -379,7 +379,32 @@ namespace HospitalDef.Controllers
         {
             return _context.Citas.Any(e => e.FolioCitas == id);
         }
-       
+        //metodo para pagar citas
+        [HttpPost]
+        public async Task<IActionResult> PagarCita(int folio)
+        {
+            try
+            {
+                var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == folio);
+
+                if (cita == null)
+                {
+                    return Json(new { ok = false, mensaje = "La cita no existe." });
+                }
+
+                cita.estatusAtencion = "PAGADO";//aqui se dispara el trigger ya que le pasa el parametro pagado
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { ok = true, mensaje = "La cita ha sido pagada con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, mensaje = "ERROR SERVIDOR: " + ex.Message });
+            }
+        }
+
+
 
 
 

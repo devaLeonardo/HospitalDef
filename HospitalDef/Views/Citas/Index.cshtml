@@ -70,10 +70,12 @@
 
                 <td class="align-middle text-nowrap">
 
-
+                    <!-- BOTÓN PAGAR -->
                     <button class="btn btn-success btn-sm fw-bold shadow-sm pagar-btn" data-id="@item.FolioCitas">
                         <i class="fas fa-credit-card me-1"></i> Pagar
                     </button>
+
+
 
                     <a asp-action="Details" asp-route-id="@item.FolioCitas" class="btn btn-outline-secondary btn-sm ms-1" title="Ver detalles">
                         <i class="fas fa-info-circle"></i>
@@ -97,5 +99,41 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+
+        $(".pagar-btn").click(function () {
+
+            let folio = $(this).data("id");
+            let token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: "/Citas/PagarCita",
+                type: "POST",
+                data: {
+                    folio: folio,
+                    __RequestVerificationToken: token
+                },
+                success: function (respuesta) {
+
+                    if (respuesta.ok) {
+                        $("#mensajePago").text(respuesta.mensaje);
+                        $("#alertaPago").fadeIn();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        alert(respuesta.mensaje);
+                    }
+                },
+                error: function () {
+                    alert("Error al procesar el pago.");
+                }
+            });
+
+        });
+
+    });
+</script>
+
+
   
 }

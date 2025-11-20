@@ -19,6 +19,7 @@
 </head>
 
 <body class="bg-light text-dark d-flex flex-column">
+    @Html.AntiForgeryToken()
 
     <header class="site-header shadow-sm">
         @await RenderSectionAsync("Styles", required: false)

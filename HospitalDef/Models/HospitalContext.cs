@@ -92,6 +92,9 @@ public partial class HospitalContext : DbContext
 
         modelBuilder.Entity<Cita>(entity =>
         {
+
+            entity.ToTable(tb => tb.HasTrigger("trCitaPagadaActualizarEstatus"));//permite reconocer el trigger para EF, debiod a que de forma natural usa un output y el trigger un update
+
             entity.HasKey(e => e.FolioCitas).HasName("PK__Citas__5E301A4972306A6B");
 
             entity.Property(e => e.estatusAtencion)
