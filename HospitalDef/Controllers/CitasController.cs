@@ -1,6 +1,7 @@
 ﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,10 +36,7 @@ namespace HospitalDef.Controllers
             if (paciente == null)
                 return BadRequest("No se encontró el paciente asociado a este usuario.");
 
-            // Cargar las citas del paciente, incluyendo:
-            // - Doctor
-            // - Empleado (nombre del doctor)
-            // - Especialidad del doctor
+            
             var citas = await _context.Citas
                 .Where(c => c.idPaciente == paciente.IdPaciente)
                 .Include(c => c.IdDoctorNavigation)
@@ -365,20 +363,75 @@ namespace HospitalDef.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cita = await _context.Citas.FindAsync(id);
-            if (cita != null)
+            try
             {
-                _context.Citas.Remove(cita);
+                var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == id);
+
+                if (cita == null)
+                {
+                    ModelState.AddModelError("estatusAtencion", "La cita no existe. "+ id);   
+                    return View();
+                }
+
+                DateTime citaCompleta = cita.fechaCita.Date + cita.horaCita;
+
+
+                //logica de penalizaciones
+
+                if (citaCompleta <= DateTime.Now)
+                {
+                    ModelState.AddModelError("estatusAtencion", "No se puede cancelar una cita pasada o en curso.");
+                    return View();
+                }
+                var tiempoRestante = (citaCompleta - DateTime.Now);
+
+                if (tiempoRestante >= TimeSpan.FromHours(48))
+                {
+                    string mensaje = "Cita eliminada. No se aplico ninguna penalizacion";
+
+                    TempData["Alerta"] = mensaje;
+                }
+                else if (tiempoRestante >= TimeSpan.FromHours(24) 
+                    && tiempoRestante< TimeSpan.FromHours(48)) 
+                
+                { 
+                    string mensaje = "Cita eliminada. Se aplicó una penalizacion del 50%.";
+
+                    TempData["Alerta"] = mensaje;
+                 }
+
+                else if (tiempoRestante < TimeSpan.FromHours(24))
+                {
+                    string mensaje = "Cita eliminada. Se aplico una penalizacion del 100%";
+
+                    TempData["Alerta"] = mensaje;
+                }
+
+
+
+
+
+
+                cita.estatusAtencion = "CANCELADO";//aqui se dispara el trigger ya que le pasa el parametro pagado
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("estatusAtencion", ex.ToString());
+                return View();
+            }
         }
 
         private bool CitaExists(int id)
         {
             return _context.Citas.Any(e => e.FolioCitas == id);
         }
+
+
         //metodo para pagar citas
         [HttpPost]
         public async Task<IActionResult> PagarCita(int folio)
@@ -403,6 +456,8 @@ namespace HospitalDef.Controllers
                 return Json(new { ok = false, mensaje = "ERROR SERVIDOR: " + ex.Message });
             }
         }
+
+
 
 
 

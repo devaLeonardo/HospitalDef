@@ -1,54 +1,124 @@
 ﻿@model HospitalDef.Models.HistorialMedicoPaciente
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Mi Historial Médico";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
 
-<div>
-    <h4>HistorialMedicoPaciente</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peso)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peso)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Alergias)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Alergias)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoSangre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoSangre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Padecimientos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Padecimientos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdPacienteNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdPacienteNavigation.IdPaciente)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdHistorialMedicoPaciente">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (User.Identity.IsAuthenticated)
+    {
+        var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? User.Identity.Name;
+
+        <div class="alert alert-primary shadow-sm border-0 d-flex align-items-center" role="alert">
+            <div class="me-3 display-4">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div>
+                <h2 class="alert-heading fw-bold">¡Hola, @nombre!</h2>
+                <p class="mb-0">
+                    A continuación se muestra tu información clínica actual.
+                    <small class="d-block text-muted mt-1">
+                        <i class="fa fa-info-circle"></i> Nota: Si detectas algún error o necesitas actualizar estos datos, por favor comunícate con tu médico asignado.
+                    </small>
+                </p>
+            </div>
+        </div>
+    }
+
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="text-secondary font-weight-bold mb-0">Resumen Clínico</h5>
+        </div>
+        <div class="card-body bg-light">
+
+            <div class="row text-center mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small">@Html.DisplayNameFor(model => model.Peso)</h6>
+                            <h3 class="display-6 text-primary fw-bold">
+                                @Html.DisplayFor(model => model.Peso) <span class="fs-6 text-muted">kg</span>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small">@Html.DisplayNameFor(model => model.Altura)</h6>
+                            <h3 class="display-6 text-primary fw-bold">
+                                @Html.DisplayFor(model => model.Altura) <span class="fs-6 text-muted">m</span>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small">@Html.DisplayNameFor(model => model.TipoSangre)</h6>
+                            <h3 class="display-6 text-danger fw-bold">
+                                @Html.DisplayFor(model => model.TipoSangre)
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-danger border-start border-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">
+                                <i class="fa fa-exclamation-triangle"></i> @Html.DisplayNameFor(model => model.Alergias)
+                            </h5>
+                            <p class="card-text lead fs-6">
+                                @if (string.IsNullOrEmpty(Model.Alergias))
+                                {
+                                    <span class="text-muted fst-italic">Ninguna registrada.</span>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(model => model.Alergias)
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-info border-start border-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-info">
+                                <i class="fa fa-notes-medical"></i> @Html.DisplayNameFor(model => model.Padecimientos)
+                            </h5>
+                            <p class="card-text lead fs-6">
+                                @if (string.IsNullOrEmpty(Model.Padecimientos))
+                                {
+                                    <span class="text-muted fst-italic">Ninguno registrado.</span>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(model => model.Padecimientos)
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                 <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-secondary">
+
+                    <i class="fa fa-arrow-left"></i> Regresar a la lista
+                </a>
+                
+            </div>
+        </div>
+    </div>
 </div>

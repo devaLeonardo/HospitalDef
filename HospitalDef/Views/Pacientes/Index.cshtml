@@ -1,11 +1,12 @@
-﻿@{
-    // Eliminamos la línea @model IEnumerable<HospitalDef.Models.Paciente>
+﻿
+
+@{
     ViewData["Title"] = "Módulo Paciente";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Asegúrate que el Layout sea el correcto
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
 }
 
 <div class="d-flex" id="wrapper">
-
+     
     <div class="border-end bg-dark" id="sidebar-menu">
         <div class="sidebar-heading text-white p-3 border-bottom border-secondary">
             <i class="fas fa-user-injured"></i> Módulo Paciente
@@ -22,7 +23,7 @@
             <a class="list-group-item list-group-item-action list-group-item-dark p-3" asp-controller="Citas" asp-action="Index">
                 <i class="fas fa-list-alt me-2"></i> Citas Agendadas
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark p-3" asp-controller="HistorialMedicoPacientes" asp-action="Index">
+            <a class="list-group-item list-group-item-action list-group-item-dark p-3" asp-controller="HistorialMedicoPacientes" asp-action="Details">
                 <i class="fas fa-user-circle me-2"></i> Datos Personales
             </a>
         </div>
@@ -43,6 +44,7 @@
             <hr />
 
             <p class="lead">Bienvenido al área de gestión de pacientes. Selecciona una opción en el menú lateral.</p>
+
         </div>
     </div>
 </div>

@@ -28,16 +28,19 @@ namespace HospitalDef.Controllers
         }
 
         // GET: HistorialMedicoPacientes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
+
+            int idUsuario = int.Parse(userId);
 
             var historialMedicoPaciente = await _context.HistorialMedicoPacientes
                 .Include(h => h.IdPacienteNavigation)
-                .FirstOrDefaultAsync(m => m.IdHistorialMedicoPaciente == id);
+                .FirstOrDefaultAsync(m => m.IdPacienteNavigation.IdUsuario == idUsuario);
+
             if (historialMedicoPaciente == null)
             {
                 return NotFound();
@@ -45,6 +48,9 @@ namespace HospitalDef.Controllers
 
             return View(historialMedicoPaciente);
         }
+
+
+
 
         // GET: HistorialMedicoPacientes/Create
         public IActionResult Create()

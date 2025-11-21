@@ -1,139 +1,176 @@
 ﻿@model IEnumerable<HospitalDef.Models.Cita>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Mis Citas";
 }
 
-<h1>Tus citas</h1>
+@Html.AntiForgeryToken()
+
+<div class="container mt-5">
+
+    <div id="alertaPago" class="alert alert-success alert-dismissible fade show shadow" role="alert" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 1050;">
+        <i class="fas fa-check-circle me-2"></i> <span id="mensajePago"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary"><i class="fas fa-calendar-alt"></i> Mis Citas</h2>
+            <p class="text-muted">Consulta y gestiona tus próximas visitas médicas.</p>
+            <p class="text-muted">El boton rojo es para cancelar la cita.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-plus-circle"></i> Agendar Nueva Cita
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary">
+                        <tr>
+                            <th class="ps-4">Fecha Cita</th>
+                            <th>Horario</th>
+                            <th>Doctor Asignado</th>
+                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark">@item.fechaCita.ToShortDateString()</span>
+                                        <small class="text-muted">Creada: @item.fechaCreacionCita.ToShortDateString()</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="far fa-clock text-primary me-1"></i>
+                                    @item.horaInicio - @item.horaTermino
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-2 text-primary">
+                                            <i class="fas fa-user-md"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold d-block">
+                                                Dr. @item.IdDoctorNavigation.IdEmpleadoNavigation.Nombre @item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoP
+                                            </span>
+                                            <span class="badge bg-info text-dark rounded-pill">
+                                                @item.IdDoctorNavigation.IdEspecialidadNavigation.Especialidades
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @if (item.estatusAtencion != null && item.estatusAtencion.ToLower().Contains("pagado"))
+                                    {
+                                        <span class="badge bg-success px-3 py-2">@item.estatusAtencion</span>
+                                    }
+                                    else if (item.estatusAtencion != null && item.estatusAtencion.ToLower().Contains("pendiente"))
+                                    {
+                                        <span class="badge bg-warning text-dark px-3 py-2">@item.estatusAtencion</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">@item.estatusAtencion</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-success btn-sm text-white pagar-btn" data-id="@item.FolioCitas" title="Pagar Cita">
+                                            <i class="fas fa-credit-card"></i> Pagar
+                                        </button>
 
 
-<p>
-    <a asp-action="Create">Agendar Cita</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.fechaCreacionCita)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.fechaCita)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.horaCita)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.horaInicio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.horaTermino)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.estatusAtencion)
-            </th>
-            <th> Doctor
-            </th>
-           
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.fechaCreacionCita)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.fechaCita)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.horaCita)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.horaInicio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.horaTermino)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.estatusAtencion)
-            </td>
-                <td>
-                    @($"{item.IdDoctorNavigation.IdEmpleadoNavigation.Nombre} {item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoP} {item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoM}")
-                    <br />
-                    <small class="text-muted">
-                        @item.IdDoctorNavigation.IdEspecialidadNavigation.Especialidades
-                    </small>
-                </td>
+                                        <a asp-action="Delete" asp-route-id="@item.FolioCitas" class="btn btn-outline-danger btn-sm shadow-sm ms-1" title="Cancelar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No tienes citas registradas.</h5>
+                    <a asp-action="Create" class="btn btn-link">Agendar una ahora</a>
+                </div>
+            }
+        </div>
+    </div>
 
-
-                <td class="align-middle text-nowrap">
-
-                    <!-- BOTÓN PAGAR -->
-                    <button class="btn btn-success btn-sm fw-bold shadow-sm pagar-btn" data-id="@item.FolioCitas">
-                        <i class="fas fa-credit-card me-1"></i> Pagar
-                    </button>
-
-
-
-                    <a asp-action="Details" asp-route-id="@item.FolioCitas" class="btn btn-outline-secondary btn-sm ms-1" title="Ver detalles">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-
-                    <a asp-action="Delete" asp-route-id="@item.FolioCitas" class="btn btn-outline-danger btn-sm ms-1" title="Cancelar Cita">
-                        <i class="fas fa-ban"></i>
-                    </a>
-                </td>
-        </tr>
-}
-    </tbody>
-</table>
-<div class="text-center mt-3">
-    <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary">Regresar</a>
-</div>
-<div id="alertaPago" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
-    <span id="mensajePago"></span>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="mt-4">
+        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary text-white">
+            <i class="fas fa-arrow-left me-2"></i> Volver a Pacientes
+        </a>
+    </div>
 </div>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function () {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        $(".pagar-btn").click(function () {
-
-            let folio = $(this).data("id");
-            let token = $('input[name="__RequestVerificationToken"]').val();
-
-            $.ajax({
-                url: "/Citas/PagarCita",
-                type: "POST",
-                data: {
-                    folio: folio,
-                    __RequestVerificationToken: token
-                },
-                success: function (respuesta) {
-
-                    if (respuesta.ok) {
-                        $("#mensajePago").text(respuesta.mensaje);
-                        $("#alertaPago").fadeIn();
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        alert(respuesta.mensaje);
-                    }
-                },
-                error: function () {
-                    alert("Error al procesar el pago.");
-                }
+    @if (TempData["Alerta"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: 'Información',
+                text: '@TempData["Alerta"]', // Aquí se inyecta el texto de C#
+                icon: 'info', // o 'warning', 'success', 'error'
+                confirmButtonText: 'Entendido'
             });
+        </script>
+    }
+    <script>
+        $(document).ready(function () {
+            $(".pagar-btn").click(function () {
+                // Animación visual del botón al hacer clic
+                var btn = $(this);
+                var originalText = btn.html();
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
 
+                let folio = $(this).data("id");
+                // Buscamos el token que agregamos al inicio del HTML
+                let token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: "/Citas/PagarCita",
+                    type: "POST",
+                    data: {
+                        folio: folio,
+                        __RequestVerificationToken: token
+                    },
+                    success: function (respuesta) {
+                        if (respuesta.ok) {
+                            $("#mensajePago").text(respuesta.mensaje);
+                            $("#alertaPago").fadeIn();
+
+                            // Recargar la página después de 1.5 segundos
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            alert(respuesta.mensaje);
+                            // Restaurar botón si falló
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function () {
+                        alert("Error de conexión al procesar el pago.");
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
         });
-
-    });
-</script>
-
-
-  
+    </script>
 }
