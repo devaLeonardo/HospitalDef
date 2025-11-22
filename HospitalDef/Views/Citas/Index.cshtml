@@ -20,7 +20,7 @@
             <p class="text-muted">El boton rojo es para cancelar la cita.</p>
         </div>
         <div>
-            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+            <a asp-action="Create" class="btn btn-outline-primary btn-sm">
                 <i class="fas fa-plus-circle"></i> Agendar Nueva Cita
             </a>
         </div>
@@ -84,7 +84,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-success btn-sm text-white pagar-btn" data-id="@item.FolioCitas" title="Pagar Cita">
+                                        <button class="btn btn-outline-success" data-id="@item.FolioCitas" title="Pagar Cita">
                                             <i class="fas fa-credit-card"></i> Pagar
                                         </button>
 
@@ -112,8 +112,8 @@
     </div>
 
     <div class="mt-4">
-        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-secondary text-white">
-            <i class="fas fa-arrow-left me-2"></i> Volver a Pacientes
+        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Volver a mi modulo
         </a>
     </div>
 </div>
