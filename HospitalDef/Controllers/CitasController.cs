@@ -36,7 +36,7 @@ namespace HospitalDef.Controllers
             if (paciente == null)
                 return BadRequest("No se encontró el paciente asociado a este usuario.");
 
-            
+
             var citas = await _context.Citas
                 .Where(c => c.idPaciente == paciente.IdPaciente)
                 .Include(c => c.IdDoctorNavigation)
@@ -44,8 +44,52 @@ namespace HospitalDef.Controllers
                 .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
                 .ToListAsync();
 
-            return View(citas);
+            bool cambios = false;
 
+            if (citas == null)
+            {
+
+                return NotFound("No se encontraron citas para este paciente.");
+            }
+            else
+            {
+
+                /*
+                version con for normal
+                for (int i = 0; i < citas.LongCount(); i++)
+                {
+                    var citaEspecifica = citas.ElementAtOrDefault(i);
+                    if (citaEspecifica.estatusAtencion.Contains("Agendada pendiente de pago") &&
+                        citaEspecifica.fechaCreacionCita.AddHours(8) < DateTime.Now)
+                    {
+                        citaEspecifica.estatusAtencion = "CANCELADA POR FALTA DE PAGO";
+                        cambios = true;
+                    }
+                }*/
+
+
+                foreach (var citaEspecifica in citas)
+                {
+                    if (citaEspecifica.estatusAtencion.Contains("Agendada pendiente de pago") &&
+                        citaEspecifica.fechaCreacionCita.AddHours(8) < DateTime.Now)
+                    {
+                        citaEspecifica.estatusAtencion = "Cancelada por falta de pago";
+                        cambios = true;
+                    }
+                    var citaDateTime = citaEspecifica.fechaCita + citaEspecifica.horaCita;  
+                    if (citaEspecifica.estatusAtencion.Contains("Pagada pendiente por atender") &&
+                        citaDateTime >= DateTime.Now)
+                    {
+                        citaEspecifica.estatusAtencion = "Atendida";
+                        cambios = true;
+                    }
+                }
+
+                if (cambios)
+                    await _context.SaveChangesAsync();
+            }
+
+            return View(citas);
 
         }
 
@@ -277,6 +321,9 @@ namespace HospitalDef.Controllers
             _context.Add(cita);
             await _context.SaveChangesAsync();
 
+            string mensaje = "Recuerda que solo tienes 8 horas para pagar tu cita";
+            TempData["Alerta Pago"] = mensaje;
+
             return RedirectToAction("Index", "Citas");
         }
 
@@ -442,7 +489,15 @@ namespace HospitalDef.Controllers
 
                 if (cita == null)
                 {
-                    return Json(new { ok = false, mensaje = "La cita no existe." });
+
+                    return Json(new { ok = false, mensaje = "La cita no existe"});
+                }
+                if ((!cita.estatusAtencion.Contains("pendiente") && !cita.estatusAtencion.Contains("pago")) ||
+                    cita.estatusAtencion.Contains("Cancelada"))
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita ya ha sido pagada previamente o ha sido cancelada" });   
+
                 }
 
                 cita.estatusAtencion = "PAGADO";//aqui se dispara el trigger ya que le pasa el parametro pagado

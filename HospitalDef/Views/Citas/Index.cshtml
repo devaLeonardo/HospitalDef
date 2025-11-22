@@ -133,6 +133,17 @@
             });
         </script>
     }
+    @if (TempData["Alerta Pago"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: 'Información',
+                text: '@TempData["Alerta Pago"]', // Aquí se inyecta el texto de C#
+                icon: 'info', // o 'warning', 'success', 'error'
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+    }
     <script>
         $(document).ready(function () {
             $(".pagar-btn").click(function () {
@@ -157,10 +168,19 @@
                             $("#mensajePago").text(respuesta.mensaje);
                             $("#alertaPago").fadeIn();
 
+
                             // Recargar la página después de 1.5 segundos
                             setTimeout(() => location.reload(), 1500);
                         } else {
-                            alert(respuesta.mensaje);
+                            Swal.fire({
+                                title: 'Información',
+                                text: respuesta.mensaje, // Aquí se inyecta el texto de C#
+                                icon: 'info', // o 'warning', 'success', 'error'
+                                confirmButtonText: 'Entendido'
+                            });
+
+
+
                             // Restaurar botón si falló
                             btn.prop('disabled', false).html(originalText);
                         }
