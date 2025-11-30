@@ -17,7 +17,7 @@
         <div>
             <h2 class="fw-bold text-primary"><i class="fas fa-calendar-alt"></i> Mis Citas</h2>
             <p class="text-muted">Consulta y gestiona tus próximas visitas médicas.</p>
-            <p class="text-muted">El boton rojo es para cancelar la cita.</p>
+            <p class="text-muted">El botón rojo es para cancelar la cita.</p>
         </div>
         <div>
             <a asp-action="Create" class="btn btn-outline-primary btn-sm">
@@ -35,6 +35,7 @@
                             <th class="ps-4">Fecha Cita</th>
                             <th>Horario</th>
                             <th>Doctor Asignado</th>
+                            <th>Consultorio</th>
                             <th class="text-center">Estatus</th>
                             <th class="text-center">Acciones</th>
                         </tr>
@@ -43,16 +44,21 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <!-- FECHA -->
                                 <td class="ps-4">
                                     <div class="d-flex flex-column">
                                         <span class="fw-bold text-dark">@item.fechaCita.ToShortDateString()</span>
                                         <small class="text-muted">Creada: @item.fechaCreacionCita.ToShortDateString()</small>
                                     </div>
                                 </td>
+
+                                <!-- HORARIO -->
                                 <td>
                                     <i class="far fa-clock text-primary me-1"></i>
                                     @item.horaInicio - @item.horaTermino
                                 </td>
+
+                                <!-- DOCTOR -->
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="bg-light rounded-circle p-2 me-2 text-primary">
@@ -60,7 +66,8 @@
                                         </div>
                                         <div>
                                             <span class="fw-bold d-block">
-                                                Dr. @item.IdDoctorNavigation.IdEmpleadoNavigation.Nombre @item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoP
+                                                Dr. @item.IdDoctorNavigation.IdEmpleadoNavigation.Nombre
+                                                @item.IdDoctorNavigation.IdEmpleadoNavigation.ApellidoP
                                             </span>
                                             <span class="badge bg-info text-dark rounded-pill">
                                                 @item.IdDoctorNavigation.IdEspecialidadNavigation.Especialidades
@@ -68,12 +75,27 @@
                                         </div>
                                     </div>
                                 </td>
+
+                                <!-- CONSULTORIO -->
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-primary">
+                                            Consultorio @item.IdDoctorNavigation.IdConsultorioNavigation.Numero
+                                        </span>
+                                        <small class="text-muted">
+                                            @item.IdDoctorNavigation.IdConsultorioNavigation.Edificio -
+                                            Planta @item.IdDoctorNavigation.IdConsultorioNavigation.Planta
+                                        </small>
+                                    </div>
+                                </td>
+
+                                <!-- ESTATUS -->
                                 <td class="text-center">
-                                    @if (item.estatusAtencion != null && item.estatusAtencion.ToLower().Contains("pagado"))
+                                    @if (!string.IsNullOrEmpty(item.estatusAtencion) && item.estatusAtencion.ToLower().Contains("pagado"))
                                     {
                                         <span class="badge bg-success px-3 py-2">@item.estatusAtencion</span>
                                     }
-                                    else if (item.estatusAtencion != null && item.estatusAtencion.ToLower().Contains("pendiente"))
+                                    else if (!string.IsNullOrEmpty(item.estatusAtencion) && item.estatusAtencion.ToLower().Contains("pendiente"))
                                     {
                                         <span class="badge bg-warning text-dark px-3 py-2">@item.estatusAtencion</span>
                                     }
@@ -82,16 +104,19 @@
                                         <span class="badge bg-secondary px-3 py-2">@item.estatusAtencion</span>
                                     }
                                 </td>
+
+                                <!-- ACCIONES -->
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-outline-success" data-id="@item.FolioCitas" title="Pagar Cita">
+
+                                        <button class="btn btn-outline-success pagar-btn" data-id="@item.FolioCitas" title="Pagar Cita">
                                             <i class="fas fa-credit-card"></i> Pagar
                                         </button>
-
 
                                         <a asp-action="Delete" asp-route-id="@item.FolioCitas" class="btn btn-outline-danger btn-sm shadow-sm ms-1" title="Cancelar">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
+
                                     </div>
                                 </td>
                             </tr>
@@ -127,8 +152,8 @@
         <script>
             Swal.fire({
                 title: 'Información',
-                text: '@TempData["Alerta"]', // Aquí se inyecta el texto de C#
-                icon: 'info', // o 'warning', 'success', 'error'
+                text: '@TempData["Alerta"]',
+                icon: 'info',
                 confirmButtonText: 'Entendido'
             });
         </script>
@@ -138,22 +163,22 @@
         <script>
             Swal.fire({
                 title: 'Información',
-                text: '@TempData["Alerta Pago"]', // Aquí se inyecta el texto de C#
-                icon: 'info', // o 'warning', 'success', 'error'
+                text: '@TempData["Alerta Pago"]',
+                icon: 'info',
                 confirmButtonText: 'Entendido'
             });
         </script>
     }
+
     <script>
         $(document).ready(function () {
             $(".pagar-btn").click(function () {
-                // Animación visual del botón al hacer clic
-                var btn = $(this);
-                var originalText = btn.html();
+
+                let btn = $(this);
+                let originalText = btn.html();
                 btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
 
                 let folio = $(this).data("id");
-                // Buscamos el token que agregamos al inicio del HTML
                 let token = $('input[name="__RequestVerificationToken"]').val();
 
                 $.ajax({
@@ -167,21 +192,14 @@
                         if (respuesta.ok) {
                             $("#mensajePago").text(respuesta.mensaje);
                             $("#alertaPago").fadeIn();
-
-
-                            // Recargar la página después de 1.5 segundos
                             setTimeout(() => location.reload(), 1500);
                         } else {
                             Swal.fire({
                                 title: 'Información',
-                                text: respuesta.mensaje, // Aquí se inyecta el texto de C#
-                                icon: 'info', // o 'warning', 'success', 'error'
+                                text: respuesta.mensaje,
+                                icon: 'info',
                                 confirmButtonText: 'Entendido'
                             });
-
-
-
-                            // Restaurar botón si falló
                             btn.prop('disabled', false).html(originalText);
                         }
                     },

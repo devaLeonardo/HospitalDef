@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using HospitalDef.Models; // Para HospitalContext y Usuario
+using HospitalDef.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims; // Para las "credenciales" del usuario
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity; // Para IPasswordHasher
+using Microsoft.AspNetCore.Identity;
 
 namespace HospitalDef.Controllers
 {
@@ -19,7 +19,6 @@ namespace HospitalDef.Controllers
             _passwordHasher = passwordHasher;
         }
 
-        // ACCIÓN PARA MOSTRAR LA VISTA DE LOGIN 
         [HttpGet]
         public IActionResult Login()
         {
@@ -30,22 +29,18 @@ namespace HospitalDef.Controllers
             return View();
         }
 
-        // ACCIÓN PARA PROCESAR EL FORMULARIO DE LOGIN
         [HttpPost]
         public async Task<IActionResult> Login(string nombreUsuario, string contraseña)
         {
-            var usuario = await _context.Usuarios//evita inyecciones sql
+            var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
 
-
-            //validacion para no enviar formulario vacio
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contraseña))
             {
                 ViewData["Mensaje"] = "Todos los campos son obligatorios.";
                 return View();
             }
 
-            // Validación básica para evitar payload extraño (aunque EF lo parametriza),ya sea ; o ' evitando inyecciones
             if (nombreUsuario.Contains("'") || nombreUsuario.Contains(";") || nombreUsuario.Length > 50)
             {
                 ViewData["Mensaje"] = "Nombre de usuario inválido.";
@@ -61,15 +56,13 @@ namespace HospitalDef.Controllers
             bool passwordCorrecta = false;
             bool necesitaMigracion = false;
 
-            // 1. Intentar login como texto plano
             if (usuario.Contraseña == contraseña)
             {
                 passwordCorrecta = true;
-                necesitaMigracion = true; // Se debe migrar la contraseña
+                necesitaMigracion = true;
             }
             else
             {
-                //2. Intentar login usando HASH
                 var result = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
                 if (result == PasswordVerificationResult.Success)
                 {
@@ -96,9 +89,25 @@ namespace HospitalDef.Controllers
                 return View();
             }
 
-            var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == usuario.IdUsuario);
+            // Buscar paciente o empleado
+            var paciente = await _context.Pacientes
+                .FirstOrDefaultAsync(p => p.IdUsuario == usuario.IdUsuario);
 
-            //5. Crear Claims, un claim es un objeto de tipo claim que sirve para describirlo, en este caso a nuestro usuario ya verificado
+            var empleado = await _context.Empleados
+                .FirstOrDefaultAsync(e => e.IdUsuario == usuario.IdUsuario);
+
+            Doctor? doctor = null;
+            Farmaceutico? farmaceutico = null;
+            Recepcionistum? recepcionista = null;
+
+            if (empleado != null)
+            {
+                doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.IdEmpleado == empleado.IdEmpleado);
+                farmaceutico = await _context.Farmaceuticos.FirstOrDefaultAsync(f => f.IdEmpleado == empleado.IdEmpleado);
+                recepcionista = await _context.Recepcionista.FirstOrDefaultAsync(r => r.IdEmpleado == empleado.IdEmpleado);
+            }
+
+            // CREACIÓN DE CLAIMS GENERALES
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
@@ -106,44 +115,54 @@ namespace HospitalDef.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
             };
 
-            if (paciente != null) { 
-                claims.Add(new Claim(ClaimTypes.GivenName, paciente.Nombre));
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                await HttpContext.SignInAsync(
+            // ============================
+            //  ASIGNAR ROL SEGÚN EL TIPO
+            // ============================
+
+            if (doctor != null)
+                claims.Add(new Claim(ClaimTypes.Role, "Doctor"));
+            else if (farmaceutico != null)
+                claims.Add(new Claim(ClaimTypes.Role, "Farmaceutico"));
+            else if (recepcionista != null)
+                claims.Add(new Claim(ClaimTypes.Role, "Recepcionista"));
+            else if (paciente != null)
+                claims.Add(new Claim(ClaimTypes.Role, "Paciente"));
+            else
+                claims.Add(new Claim(ClaimTypes.Role, "SinRol"));
+
+            // FIRMAR SESIÓN
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity)
             );
 
+            // ==============================
+            //  REDIRECCIÓN SEGÚN EL ROL
+            // ==============================
+
+            if (doctor != null)
+                return RedirectToAction("Index", "Doctors");
+
+            if (farmaceutico != null)
+                return RedirectToAction("Index", "Farmaceutico");
+
+            if (recepcionista != null)
+                return RedirectToAction("Index", "Recepcionista");
+
+            if (paciente != null)
                 return RedirectToAction("Index", "Pacientes");
 
-            }
-            else
-            {
-                    var claims2 = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, usuario.NombreUsuario),
-                    new Claim(ClaimTypes.Email, usuario.Correo),
-                    new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
-                };
-          
-                    var identity = new ClaimsIdentity(claims2, CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(identity)
-                );
-                    return RedirectToAction("Create", "Pacientes");
-                
-            }
-
-
+            // SI NO TIENE PERFIL, CREAR PACIENTE
+            return RedirectToAction("Create", "Pacientes");
         }
-        //cerrar sesion
+
+        // CERRAR SESIÓN
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Acceso");
         }
-
     }
 }

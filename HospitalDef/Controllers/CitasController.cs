@@ -42,7 +42,13 @@ namespace HospitalDef.Controllers
                 .Include(c => c.IdDoctorNavigation)
                     .ThenInclude(d => d.IdEmpleadoNavigation)
                 .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
-                .ToListAsync();
+                    .Include(c => c.IdDoctorNavigation)
+                    .ThenInclude(d => d.IdEmpleadoNavigation)
+                    .Include(c => c.IdDoctorNavigation)
+                    .ThenInclude(d => d.IdEspecialidadNavigation)
+                    .Include(c => c.IdDoctorNavigation)
+                    .ThenInclude(d => d.IdConsultorioNavigation)
+                    .ToListAsync();
 
             bool cambios = false;
 
@@ -77,8 +83,8 @@ namespace HospitalDef.Controllers
                         cambios = true;
                     }
                     var citaDateTime = citaEspecifica.fechaCita + citaEspecifica.horaCita;  
-                    if (citaEspecifica.estatusAtencion.Contains("Pagada pendiente por atender") &&
-                        citaDateTime >= DateTime.Now)
+                    if (citaEspecifica.estatusAtencion.Contains("Cita pagada pendiente por atender") &&
+                        citaDateTime < DateTime.Now)
                     {
                         citaEspecifica.estatusAtencion = "Atendida";
                         cambios = true;
@@ -117,6 +123,7 @@ namespace HospitalDef.Controllers
         public IActionResult Create()
         {
 
+
             ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
             // Id del usuario loggeado
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -141,8 +148,9 @@ namespace HospitalDef.Controllers
             {
                 fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
             };
+            if (cita.idDoctor.HasValue)
+                CargarHorarioDoctor(cita.idDoctor.Value);
 
-            CargarCombos(cita);
 
             return View(cita);
         }
@@ -218,7 +226,7 @@ namespace HospitalDef.Controllers
             {
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
-                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
                 return View(cita);
             }
 
@@ -241,7 +249,7 @@ namespace HospitalDef.Controllers
             {
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
-                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
                 return View(cita);
             }
 
@@ -289,7 +297,7 @@ namespace HospitalDef.Controllers
             {
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
-                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
                 return View(cita);
             }
 
@@ -313,7 +321,7 @@ namespace HospitalDef.Controllers
             {
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
-                    CargarHorarioDoctor(cita.idDoctor.Value);//no desaparece el horario
+                    CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
                 return View(cita);
             }
 
@@ -410,68 +418,48 @@ namespace HospitalDef.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            Cita cita = null;
+
             try
             {
-                var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == id);
+                cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == id);
 
                 if (cita == null)
                 {
-                    ModelState.AddModelError("estatusAtencion", "La cita no existe. "+ id);   
-                    return View();
+                    ModelState.AddModelError("estatusAtencion", "La cita no existe. " + id);
+                    return View(new Cita());
                 }
 
                 DateTime citaCompleta = cita.fechaCita.Date + cita.horaCita;
 
-
-                //logica de penalizaciones
-
                 if (citaCompleta <= DateTime.Now)
                 {
                     ModelState.AddModelError("estatusAtencion", "No se puede cancelar una cita pasada o en curso.");
-                    return View();
+                    return View(cita);
                 }
-                var tiempoRestante = (citaCompleta - DateTime.Now);
+
+                var tiempoRestante = citaCompleta - DateTime.Now;
 
                 if (tiempoRestante >= TimeSpan.FromHours(48))
-                {
-                    string mensaje = "Cita eliminada. No se aplico ninguna penalizacion";
+                    TempData["Alerta"] = "Cita eliminada. No se aplico ninguna penalizacion";
+                else if (tiempoRestante >= TimeSpan.FromHours(24) && tiempoRestante < TimeSpan.FromHours(48))
+                    TempData["Alerta"] = "Cita eliminada. Se aplico una penalizacion del 50%.";
+                else
+                    TempData["Alerta"] = "Cita eliminada. Se aplico una penalizacion del 100%.";
 
-                    TempData["Alerta"] = mensaje;
-                }
-                else if (tiempoRestante >= TimeSpan.FromHours(24) 
-                    && tiempoRestante< TimeSpan.FromHours(48)) 
-                
-                { 
-                    string mensaje = "Cita eliminada. Se aplicó una penalizacion del 50%.";
-
-                    TempData["Alerta"] = mensaje;
-                 }
-
-                else if (tiempoRestante < TimeSpan.FromHours(24))
-                {
-                    string mensaje = "Cita eliminada. Se aplico una penalizacion del 100%";
-
-                    TempData["Alerta"] = mensaje;
-                }
-
-
-
-
-
-
-                cita.estatusAtencion = "CANCELADO";//aqui se dispara el trigger ya que le pasa el parametro pagado
+                cita.estatusAtencion = "CANCELADO";
 
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
-
             catch (Exception ex)
             {
                 ModelState.AddModelError("estatusAtencion", ex.ToString());
-                return View();
+                return View(cita ?? new Cita());
             }
         }
+
 
         private bool CitaExists(int id)
         {
@@ -554,8 +542,7 @@ namespace HospitalDef.Controllers
             ViewBag.PacienteNombre = paciente?.Nombre;
             ViewBag.PacienteId = paciente?.IdPaciente;
         }
-
-        private void CargarHorarioDoctor(int idDoctor)
+        public IActionResult GetHorarioDoctor(int idDoctor)
         {
             var horario = _context.VistaDoctorHorario
                 .Where(h => h.IdDoctor == idDoctor)
@@ -563,26 +550,22 @@ namespace HospitalDef.Controllers
                 {
                     dia = h.DiaSemana,
                     inicio = h.HoraInicio.ToString(@"hh\:mm"),
-                    fin = h.HoraFin.ToString(@"hh\:mm")
+                    fin = h.HoraFin.ToString(@"hh\:mm"),
+                    consultorio = h.Consultorio
                 })
                 .ToList();
 
-            ViewBag.HorarioDoctor = horario;
+            return Json(horario);
         }
-        [HttpGet]
-        public JsonResult GetHorarioDoctor(int idDoctor)
+
+
+        private void CargarHorarioDoctor(int idDoctor)
         {
             var horario = _context.VistaDoctorHorario
-                                  .Where(h => h.IdDoctor == idDoctor)
-                                  .Select(h => new
-                                  {
-                                      dia = h.DiaSemana,
-                                      inicio = h.HoraInicio.ToString(@"hh\:mm"),
-                                      fin = h.HoraFin.ToString(@"hh\:mm")
-                                  })
-                                  .ToList();
+                .Where(h => h.IdDoctor == idDoctor)
+                .ToList();
 
-            return Json(horario);
+            ViewBag.HorarioDoctor = horario;
         }
 
 

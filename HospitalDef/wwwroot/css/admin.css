@@ -1,0 +1,485 @@
+﻿:root {
+    --bg: #0f1724;
+    --surface: #0b1220;
+    --muted: #9aa4b2;
+    --accent-a: #6366f1; /* indigo */
+    --accent-b: #06b6d4; /* cyan */
+    --glass: rgba(255,255,255,0.04);
+    --radius: 12px;
+    --fw-semibold: 600;
+    --maxwidth: 1100px;
+    --text: #e6eef8;
+}
+
+/* Tipografía ligera (si no quieres Google Fonts, manten la familia local) */
+body {
+    background: linear-gradient(180deg,var(--bg) 0%, #071029 100%);
+    color: var(--text);
+    font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+    font-size: 15px;
+}
+
+    /* Reglas críticas para páginas admin (más específicas que bootstrap) */
+    body.admin-page {
+        background: linear-gradient(180deg, #0f1724 0%, #071029 100%) !important;
+        color: #e6eef8 !important;
+    }
+
+        body.admin-page .navbar {
+            background: transparent !important;
+            border-bottom: none !important;
+        }
+
+        body.admin-page .admin-wrapper {
+            margin: 36px auto;
+            padding: 28px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)) !important;
+            border-radius: 16px;
+            box-shadow: 0 8px 36px rgba(2,6,23,0.7);
+        }
+
+/* Contenedor central */
+.admin-wrapper {
+    max-width: var(--maxwidth);
+    margin: 36px auto;
+    padding: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: 16px;
+    box-shadow: 0 8px 36px rgba(2,6,23,0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.02);
+}
+
+/* Forzar estilos del dashboard aunque el layout use body.bg-light (mayor especificidad) */
+body.bg-light .admin-wrapper {
+    max-width: 1100px;
+    margin: 36px auto;
+    padding: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: 16px;
+    box-shadow: 0 8px 36px rgba(2,6,23,0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.02);
+}
+
+/* Cabecera */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.admin-title {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.admin-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,var(--accent-a), var(--accent-b));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+    font-size: 18px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    letter-spacing: -0.2px;
+}
+
+.admin-sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+/* Acción toolbar */
+.admin-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Cards */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.admin-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.03);
+    padding: 18px;
+    border-radius: 12px;
+    text-align: left;
+    transition: transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .16s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+    .admin-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 40px rgba(2,6,23,0.55);
+    }
+
+    .admin-card .card-head {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(2,6,23,0.45);
+}
+
+.card-title {
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.card-desc {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Badges */
+.role-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: white;
+}
+
+.role-farm {
+    background: #0ea5a4;
+}
+/* teal */
+.role-doc {
+    background: #7c3aed;
+}
+/* purple */
+.role-rec {
+    background: #f97316;
+}
+/* orange */
+
+/* Botones */
+.btn-admin {
+    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 8px 26px rgba(99,102,241,0.16);
+    text-decoration: none;
+    display: inline-block;
+    transition: transform .12s, box-shadow .12s;
+}
+
+    .btn-admin:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 46px rgba(99,102,241,0.18);
+    }
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 10px;
+}
+
+/* Formularios */
+.form-admin {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+    .form-admin .form-label {
+        color: var(--muted);
+        font-weight: 600;
+    }
+
+    .form-admin .form-control {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.04);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+        .form-admin .form-control:focus {
+            outline: none;
+            box-shadow: 0 8px 26px rgba(99,102,241,0.10);
+            border-color: rgba(99,102,241,0.9);
+        }
+
+/* Tabla */
+.table-admin {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    margin-top: 8px;
+}
+
+    .table-admin th, .table-admin td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .table-admin th {
+        text-align: left;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+/* Small screens */
+@media (max-width:720px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .admin-wrapper {
+        margin: 18px;
+        padding: 14px;
+    }
+
+    .card-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .btn-admin {
+        width: 100%;
+        text-align: center;
+        padding: 10px 12px;
+    }
+}
+
+:root {
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa4b2;
+    --accent: #4f46e5;
+    --accent-2: #06b6d4;
+    --success: #16a34a;
+    --danger: #ef4444;
+    --glass: rgba(255,255,255,0.04);
+    --radius: 12px;
+    --fw-semibold: 600;
+    --maxwidth: 1100px;
+}
+
+/* Reset ligero */
+body {
+    background: linear-gradient(180deg,var(--bg) 0%, #071029 100%);
+    color: #e6eef8;
+    font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Contenedor central */
+.admin-wrapper {
+    max-width: var(--maxwidth);
+    margin: 32px auto;
+    padding: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius: 16px;
+    box-shadow: 0 6px 30px rgba(2,6,23,0.7);
+    backdrop-filter: blur(6px);
+}
+
+/* Header */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+    .admin-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        letter-spacing: -0.2px;
+    }
+
+.admin-sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+/* Card actions */
+.admin-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+}
+
+.admin-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 18px;
+    border-radius: var(--radius);
+    min-width: 220px;
+    text-align: center;
+    transition: transform .14s ease, box-shadow .14s ease;
+}
+
+    .admin-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
+
+    .admin-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+    }
+
+/* Botones */
+.btn-admin {
+    --btn-bg: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: var(--fw-semibold);
+    box-shadow: 0 6px 18px rgba(79,70,229,0.18);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 10px;
+}
+
+/* Grid para opciones grandes */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+/* Badges/labels */
+.role-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+}
+
+.role-farm {
+    background: #0ea5a4;
+}
+/* teal */
+.role-doc {
+    background: #7c3aed;
+}
+/* purple */
+.role-rec {
+    background: #f97316;
+}
+/* orange */
+
+/* Formularios */
+.form-admin {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+    .form-admin .form-label {
+        color: var(--muted);
+        font-weight: 600;
+    }
+
+    .form-admin .form-control {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.04);
+        color: #eaf2ff;
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+        .form-admin .form-control:focus {
+            outline: none;
+            box-shadow: 0 6px 20px rgba(79,70,229,0.12);
+            border-color: rgba(79,70,229,0.9);
+        }
+
+/* Tablas */
+.table-admin {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+    .table-admin th, .table-admin td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .table-admin th {
+        text-align: left;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+/* Responsive */
+@media (max-width:720px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .admin-wrapper {
+        margin: 18px;
+        padding: 14px;
+    }
+}

@@ -21,10 +21,7 @@
             <div class="form-group mb-3">
                 <label>Paciente:</label>
 
-                <!-- Nombre visible -->
                 <input class="form-control" value="@ViewBag.PacienteNombre" disabled />
-
-                <!-- ID oculto (se mantiene SIEMPRE) -->
                 <input type="hidden" asp-for="idPaciente" value="@ViewBag.PacienteId" />
             </div>
 
@@ -56,18 +53,9 @@
                 <span asp-validation-for="idDoctor" class="text-danger"></span>
             </div>
 
-            <!-- HORARIO DEL DOCTOR -->
-            <div id="doctor-horario" class="alert alert-info" style="display:@(ViewBag.HorarioDoctor != null ? "block" : "none")">
-
-                @if (ViewBag.HorarioDoctor != null)
-                {
-                    <ul>
-                        @foreach (var h in ViewBag.HorarioDoctor)
-                        {
-                            <li><b>@h.dia</b>: @h.inicio - @h.fin</li>
-                        }
-                    </ul>
-                }
+            <!-- HORARIO POR AJAX -->
+            <div id="doctor-horario" class="mt-3" style="display:none;">
+                <!-- Se llenará dinámicamente -->
             </div>
 
             <!-- FECHA CITA -->
@@ -82,10 +70,9 @@
                 <span asp-validation-for="fechaCita" class="text-danger"></span>
             </div>
 
-            <!-- ⭐ BOTONES AL MISMO NIVEL ⭐ -->
+            <!-- BOTONES -->
             <div class="d-flex justify-content-between mt-4">
                 <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-secondary">Regresar</a>
-
                 <input type="submit" value="Agendar Cita" class="btn btn-outline-primary btn-sm" />
             </div>
 
@@ -101,6 +88,10 @@
     }
 
     <script>
+
+        // ===========================
+        // CARGAR DOCTORES POR AJAX
+        // ===========================
         $(document).ready(function () {
 
             let especialidadSeleccionada = $("#ddlEspecialidad").val();
@@ -135,6 +126,7 @@
 
                         if (doctorActual) {
                             $("#ddlDoctor").val(doctorActual);
+                            cargarHorarioDoctor(doctorActual);
                         }
                     }
                 });
@@ -142,9 +134,13 @@
 
         });
 
+
+        // ===========================
+        // CARGAR HORARIO DEL DOCTOR
+        // ===========================
         $("#ddlDoctor").change(function () {
-            let doctorId = $(this).val();
-            cargarHorarioDoctor(doctorId);
+            let idDoctor = $(this).val();
+            cargarHorarioDoctor(idDoctor);
         });
 
         function cargarHorarioDoctor(idDoctor) {
@@ -160,20 +156,40 @@
                 data: { idDoctor: idDoctor },
                 success: function (data) {
 
-                    if (data.length === 0) {
-                        $("#doctor-horario").html("El doctor no tiene horario registrado.");
-                        $("#doctor-horario").show();
+                    if (!data || data.length === 0) {
+                        $("#doctor-horario")
+                            .html("<div class='alert alert-warning mt-2'>El doctor no tiene horario registrado.</div>")
+                            .show();
                         return;
                     }
 
-                    let html = "<ul>";
-                    $.each(data, function (i, h) {
-                        html += `<li><b>${h.dia}</b>: ${h.inicio} - ${h.fin}</li>`;
-                    });
-                    html += "</ul>";
+                    let html = `
+                        <h4>Horario del Doctor</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Inicio</th>
+                                    <th>Fin</th>
+                                    <th>Consultorio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
 
-                    $("#doctor-horario").html(html);
-                    $("#doctor-horario").show();
+                    $.each(data, function (i, h) {
+                        html += `
+                            <tr>
+                                <td>${h.dia}</td>
+                                <td>${h.inicio}</td>
+                                <td>${h.fin}</td>
+                                <td>${h.consultorio}</td>
+                            </tr>`;
+                    });
+
+                    html += "</tbody></table>";
+
+                    $("#doctor-horario").html(html).show();
                 }
             });
         }
