@@ -115,10 +115,8 @@ namespace HospitalDef.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
             };
 
-            // ============================
+    
             //  ASIGNAR ROL SEGÚN EL TIPO
-            // ============================
-
             if (doctor != null)
                 claims.Add(new Claim(ClaimTypes.Role, "Doctor"));
             else if (farmaceutico != null)
@@ -137,18 +135,16 @@ namespace HospitalDef.Controllers
                 new ClaimsPrincipal(identity)
             );
 
-            // ==============================
-            //  REDIRECCIÓN SEGÚN EL ROL
-            // ==============================
 
+            //  REDIRECCIÓN SEGÚN EL ROL
             if (doctor != null)
                 return RedirectToAction("Index", "Doctors");
 
             if (farmaceutico != null)
-                return RedirectToAction("Index", "Farmaceutico");
+                return RedirectToAction("Index", "Farmaceuticoes");
 
             if (recepcionista != null)
-                return RedirectToAction("Index", "Recepcionista");
+                return RedirectToAction("Index", "Recepcionistums");
 
             if (paciente != null)
                 return RedirectToAction("Index", "Pacientes");
