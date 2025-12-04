@@ -1,0 +1,61 @@
+﻿body {
+    background: #f5f7fa;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor general */
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 80px); /* evita que se meta al layout */
+}
+
+/* Menú lateral */
+.sidebar {
+    width: 250px;
+    background: #243447;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+/* Botones del menú */
+.menu-btn {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    background: #31475e;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+    .menu-btn:hover {
+        background: #3e5a78;
+    }
+
+/* Contenido principal */
+.main-content {
+    padding: 40px;
+    flex-grow: 1;
+}
+
+.welcome-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.welcome-text {
+    font-size: 18px;
+    color: #555;
+}

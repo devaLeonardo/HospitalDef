@@ -116,7 +116,7 @@ namespace HospitalDef.Controllers
             };
 
     
-            //  ASIGNAR ROL SEGÚN EL TIPO
+            //  ASIGNAR ROL SEGUN EL TIPO
             if (doctor != null)
                 claims.Add(new Claim(ClaimTypes.Role, "Doctor"));
             else if (farmaceutico != null)

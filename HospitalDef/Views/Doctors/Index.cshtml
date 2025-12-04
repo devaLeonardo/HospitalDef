@@ -1,53 +1,27 @@
 ﻿@model IEnumerable<HospitalDef.Models.Doctor>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "doctorIndex";
+
+    var doctor = Model.FirstOrDefault();
+    string nombre = doctor?.IdEmpleadoNavigation?.Nombre ?? "Doctor";
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" href="~/css/doctorIndex.css" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CedulaProf)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdConsultorioNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdEmpleadoNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdEspecialidadNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CedulaProf)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdConsultorioNavigation.IdConsultorio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdEmpleadoNavigation.IdEmpleado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdEspecialidadNavigation.IdEspecialidad)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdDoctor">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdDoctor">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdDoctor">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="dashboard-container">
+
+    <div class="sidebar">
+        <h2 class="menu-title">Menú</h2>
+
+        <a class="menu-btn" href="#">Citas pendientes</a>
+        <a class="menu-btn" href="#">Datos personales</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1 class="welcome-title">Bienvenido doctor @nombre</h1>
+        <p class="welcome-text">Seleccione una opción del menú para continuar.</p>
+    </div>
+
+</div>
