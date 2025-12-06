@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -26,18 +27,21 @@ namespace HospitalDef.Controllers
         }
 
         // GET: Doctors/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
+
+            int idUsuario = int.Parse(userId);
+
 
             var doctor = await _context.Doctors
                 .Include(d => d.IdConsultorioNavigation)
                 .Include(d => d.IdEmpleadoNavigation)
                 .Include(d => d.IdEspecialidadNavigation)
-                .FirstOrDefaultAsync(m => m.IdDoctor == id);
+                .FirstOrDefaultAsync(m => m.IdDoctor == idUsuario);
             if (doctor == null)
             {
                 return NotFound();
