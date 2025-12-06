@@ -29,21 +29,23 @@ namespace HospitalDef.Controllers
 
             // ID del usuario logueado
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var role = User.FindFirst(ClaimTypes.Role).Value;
 
-            // Obtener al paciente relacionado al usuario
-            var paciente = await _context.Pacientes
-                .FirstOrDefaultAsync(p => p.IdUsuario == userId);
+            
             var citas = new List<Cita>();
 
             
 
 
 
-            if (paciente == null)
+            if (role.Equals("Doctor"))
             {
                 var doctor = await _context.Doctors
                 .Include(d => d.IdEmpleadoNavigation)
                 .FirstOrDefaultAsync(d => d.IdEmpleadoNavigation.IdUsuario == userId);
+
+                if(doctor == null)
+                    return BadRequest("No se encontró el doctor del usuario logueado.");
 
                 var citasDoc = await _context.Citas
                        .Where(c => c.idDoctor == doctor.IdDoctor)
@@ -60,11 +62,15 @@ namespace HospitalDef.Controllers
                            .ToListAsync();
                 citas = citasDoc;
 
-
-
             }
-            else
+            if(role.Equals("Paciente"))
             {
+                var paciente = await _context.Pacientes
+                .FirstOrDefaultAsync(p => p.IdUsuario == userId);
+
+                if(paciente == null)
+                    return BadRequest("No se encontró el paciente del usuario logueado.");
+
                 var citasPac = await _context.Citas
                        .Where(c => c.idPaciente == paciente.IdPaciente)
                        .Include(c => c.IdDoctorNavigation)
@@ -86,7 +92,6 @@ namespace HospitalDef.Controllers
 
             if (citas == null)
             {
-
                 return NotFound("No se encontraron citas para este paciente.");
             }
             else
@@ -114,7 +119,7 @@ namespace HospitalDef.Controllers
             }
 
 
-            if(paciente == null)
+            if(!role.Equals("Paciente"))
                 return View("IndexDoctor", citas);
             else
                 return View("Index", citas);

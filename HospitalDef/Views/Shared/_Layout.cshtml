@@ -17,7 +17,9 @@
     <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-
+@{
+   var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+ }
 <body class="bg-light text-dark d-flex flex-column">
     @Html.AntiForgeryToken()
 
@@ -41,10 +43,16 @@
 
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto align-items-lg-center">
+                        
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">Contacto</a>
-                        </li>
+                        @if (role != null && role.Equals("Paciente")) {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Privacy">Contacto</a>
+                            </li>
+                        }
+                        
+
+
 
                         @if (User.Identity.IsAuthenticated)
                         {
@@ -55,8 +63,30 @@
                                     <i class="bi bi-person-circle"></i> @User.Identity.Name
                                 </span>
 
-                                <!-- Botón TU MÓDULO  -->
-                                <a class="btn btn-outline-primary btn-sm" asp-controller="Pacientes" asp-action="Index">Tu Modulo</a>
+
+                                @if (role != null && role.Equals("Paciente")) 
+                                {
+                                    <!-- Botón TU MÓDULO  -->
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="Pacientes" asp-action="Index">Tu Modulo</a>
+                                }
+                                @if (role != null && role.Equals("Doctor"))
+                                {
+                                    <!-- Botón TU MÓDULO  -->
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="Doctors" asp-action="Index">Tu Modulo</a>
+                                }
+                                @if (role != null && role.Equals("Recepcionista"))
+                                {
+                                    <!-- Botón TU MÓDULO  -->
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="Recepcionistums" asp-action="Index">Tu Modulo</a>
+                                }
+                                @if (role != null && role.Equals("Farmaceutico"))
+                                {
+                                    <!-- Botón TU MÓDULO  -->
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="Farmaceuticoes" asp-action="Index">Tu Modulo</a>
+                                }
+
+
+
 
                                 <!-- Botón CERRAR SESIÓN  -->
                                 <form asp-controller="Acceso" asp-action="Logout" method="post" class="m-0">

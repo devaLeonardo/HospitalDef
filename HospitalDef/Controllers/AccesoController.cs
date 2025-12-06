@@ -113,6 +113,7 @@ namespace HospitalDef.Controllers
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Email, usuario.Correo),
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
+                
             };
 
     
@@ -127,6 +128,18 @@ namespace HospitalDef.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, "Paciente"));
             else
                 claims.Add(new Claim(ClaimTypes.Role, "SinRol"));
+
+            //Para el nombre completo
+            if (empleado != null)
+            {
+                claims.Add(new Claim(ClaimTypes.GivenName, empleado.Nombre.ToString()));
+            }
+            else if (paciente != null)
+            {
+                claims.Add(new Claim(ClaimTypes.GivenName, paciente.Nombre.ToString()));
+            }
+
+
 
             // FIRMAR SESIÓN
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

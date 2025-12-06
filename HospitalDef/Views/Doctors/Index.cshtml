@@ -3,8 +3,9 @@
 @{
     ViewData["Title"] = "doctorIndex";
 
-    var doctor = Model.FirstOrDefault();
-    string nombre = doctor?.IdEmpleadoNavigation?.Nombre ?? "Doctor";
+   
+    var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+    
 }
 
 <link rel="stylesheet" href="~/css/doctorIndex.css" />
@@ -20,7 +21,7 @@
 
     <!-- Contenido principal -->
     <div class="main-content">
-        <h1 class="welcome-title">Bienvenido doctor @nombre</h1>
+        <h1 class="welcome-title">Bienvenido/a Dr. @nombre</h1>
         <p class="welcome-text">Seleccione una opción del menú para continuar.</p>
     </div>
 
