@@ -34,6 +34,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+                
                 <div class="alert alert-info shadow-sm" role="alert">
                     <h4 class="alert-heading">¡Hola, @nombre!</h4>
                     <p>Utiliza el menú de la izquierda para **agendar, revisar tus citas o actualizar tus datos personales.**</p>

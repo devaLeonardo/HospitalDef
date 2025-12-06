@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -32,25 +33,56 @@ namespace HospitalDef.Controllers
             // Obtener al paciente relacionado al usuario
             var paciente = await _context.Pacientes
                 .FirstOrDefaultAsync(p => p.IdUsuario == userId);
+            var citas = new List<Cita>();
+
+            
+
+
 
             if (paciente == null)
-                return BadRequest("No se encontró el paciente asociado a este usuario.");
+            {
+                var doctor = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdEmpleadoNavigation.IdUsuario == userId);
+
+                var citasDoc = await _context.Citas
+                       .Where(c => c.idDoctor == doctor.IdDoctor)
+                       .Include(c=>c.IdPacienteNavigation)
+                       .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                       .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEspecialidadNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdConsultorioNavigation)
+                           .ToListAsync();
+                citas = citasDoc;
 
 
-            var citas = await _context.Citas
-                .Where(c => c.idPaciente == paciente.IdPaciente)
-                .Include(c => c.IdDoctorNavigation)
-                    .ThenInclude(d => d.IdEmpleadoNavigation)
-                .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
-                    .Include(c => c.IdDoctorNavigation)
-                    .ThenInclude(d => d.IdEmpleadoNavigation)
-                    .Include(c => c.IdDoctorNavigation)
-                    .ThenInclude(d => d.IdEspecialidadNavigation)
-                    .Include(c => c.IdDoctorNavigation)
-                    .ThenInclude(d => d.IdConsultorioNavigation)
-                    .ToListAsync();
 
+            }
+            else
+            {
+                var citasPac = await _context.Citas
+                       .Where(c => c.idPaciente == paciente.IdPaciente)
+                       .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                       .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdEspecialidadNavigation)
+                           .Include(c => c.IdDoctorNavigation)
+                           .ThenInclude(d => d.IdConsultorioNavigation)
+                           .ToListAsync();
+
+                citas = citasPac;
+            }
+                
             bool cambios = false;
+
 
             if (citas == null)
             {
@@ -59,20 +91,6 @@ namespace HospitalDef.Controllers
             }
             else
             {
-
-                /*
-                version con for normal
-                for (int i = 0; i < citas.LongCount(); i++)
-                {
-                    var citaEspecifica = citas.ElementAtOrDefault(i);
-                    if (citaEspecifica.estatusAtencion.Contains("Agendada pendiente de pago") &&
-                        citaEspecifica.fechaCreacionCita.AddHours(8) < DateTime.Now)
-                    {
-                        citaEspecifica.estatusAtencion = "CANCELADA POR FALTA DE PAGO";
-                        cambios = true;
-                    }
-                }*/
-
 
                 foreach (var citaEspecifica in citas)
                 {
@@ -95,9 +113,15 @@ namespace HospitalDef.Controllers
                     await _context.SaveChangesAsync();
             }
 
-            return View(citas);
+
+            if(paciente == null)
+                return View("IndexDoctor", citas);
+            else
+                return View("Index", citas);
 
         }
+
+
 
         // GET: Citas/Details/5
         public async Task<IActionResult> Details(int? id)
