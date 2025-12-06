@@ -19,15 +19,10 @@ namespace HospitalDef.Controllers
             _context = context;
         }
 
-        // GET: Doctors
-        public async Task<IActionResult> Index()
-        {
-            var hospitalContext = _context.Doctors.Include(d => d.IdConsultorioNavigation).Include(d => d.IdEmpleadoNavigation).Include(d => d.IdEspecialidadNavigation);
-            return View(await hospitalContext.ToListAsync());
-        }
+        
 
         // GET: Doctors/Details/5
-        public async Task<IActionResult> Details()
+        public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
