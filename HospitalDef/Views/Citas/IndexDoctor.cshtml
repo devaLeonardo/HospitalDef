@@ -100,7 +100,7 @@
                                 </td>
 
                                 <!-- ESTATUS -->
-                                <td class="text-center">
+                                <td class="columna-estatus text-center">
                                     @if (!string.IsNullOrEmpty(item.estatusAtencion) && item.estatusAtencion.ToLower().Contains("pagado"))
                                     {
                                         <span class="badge bg-success px-3 py-2">@item.estatusAtencion</span>
@@ -117,10 +117,16 @@
 
                                 <!-- ACCIONES -->
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
+                                    <div class="d-flex justify-content-center gap-2">
 
-                                        <a asp-action="Delete" asp-route-id="@item.FolioCitas" class="btn btn-outline-danger btn-sm shadow-sm ms-1" title="Cancelar">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <a asp-controller="Recetums" asp-action="Create" asp-route-id="@item.FolioCitas" class="btn btn-success btn-sm shadow-sm btn-atender-cita">
+                                            <i class="fas fa-user-check me-1"></i> Atender
+                                        </a>
+
+                                        <a asp-action="Delete" asp-route-id="@item.FolioCitas"
+                                           class="btn btn-danger btn-sm shadow-sm btn-cancelar-cita"
+                                           title="Cancelar Cita">
+                                            <i class="fas fa-trash-alt me-1"></i> Cancelar
                                         </a>
 
                                     </div>
@@ -136,7 +142,6 @@
                 <div class="text-center py-5">
                     <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">No tienes citas registradas.</h5>
-                    <a asp-action="Create" class="btn btn-link">Agendar una ahora</a>
                 </div>
             }
         </div>
@@ -149,9 +154,107 @@
     </div>
 </div>
 
+
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // Usamos 'document.on' por si tu tabla usa paginación o recargas parciales
+            $(document).on('click', '.btn-cancelar-cita', function (e) {
+                e.preventDefault();
+
+                var boton = $(this);
+                var urlDestino = boton.attr('href');
+
+                // Buscamos la fila y la columna
+                var fila = boton.closest('tr');
+
+                // TRUCO: .text() a veces trae espacios, .innerText es más limpio,
+                // pero .trim() es obligatorio.
+                var textoSucio = fila.find('.columna-estatus').text();
+                var estatusTexto = textoSucio.trim().toUpperCase();
+
+                // VALIDACIÓN MÁS AMPLIA
+                // Buscamos "PAG" (cubre Pagado, Pagada, Pago)
+                // Buscamos "CANCEL" (cubre Cancelado, Cancelada)
+                if (estatusTexto.includes("ATENDIDA") || estatusTexto.includes("CANCEL")) {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se puede cancelar',
+                        // Mostramos el estatus para que el usuario entienda por qué
+                        text: 'El estatus actual es: ' + estatusTexto,
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return; // Se sale y NO muestra la confirmación de borrado
+                }
+
+                // Si llegamos aquí, es porque NO estaba pagado ni cancelado
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Vas a cancelar esta cita pendiente.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = urlDestino;
+                    }
+                });
+            });
+
+        });
+    </script>
+
+
+    
+    <script>
+        //PARA ATENDIDA
+        $(document).ready(function () {
+
+            // Usamos 'document.on' por si tu tabla usa paginación o recargas parciales
+            $(document).on('click', '.btn-atender-cita', function (e) {
+                e.preventDefault();
+
+                var boton = $(this);
+                var urlDestino = boton.attr('href');
+
+                // Buscamos la fila y la columna
+                var fila = boton.closest('tr');
+
+                // TRUCO: .text() a veces trae espacios, .innerText es más limpio,
+                // pero .trim() es obligatorio.
+                var textoSucio = fila.find('.columna-estatus').text();
+                var estatusTexto = textoSucio.trim().toUpperCase();
+
+                if (estatusTexto.includes("AGENDADA") || estatusTexto.includes("CANCEL") || estatusTexto.includes("ATENDIDA") ) {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se puede atender esta cita',
+                        text: 'El estatus actual es: ' + estatusTexto,
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return; // Se sale y NO muestra la confirmación de borrado
+                }
+
+                // Si llegamos aquí, es porque NO estaba pagado ni cancelado
+              window.location.href = urlDestino;
+
+
+                
+            });
+
+        });
+    </script>
+
+
+
 
     @if (TempData["Alerta"] != null)
     {

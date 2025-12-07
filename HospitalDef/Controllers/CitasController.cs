@@ -580,7 +580,6 @@ namespace HospitalDef.Controllers
                     dia = h.DiaSemana,
                     inicio = h.HoraInicio.ToString(@"hh\:mm"),
                     fin = h.HoraFin.ToString(@"hh\:mm"),
-                    consultorio = h.Consultorio
                 })
                 .ToList();
 
