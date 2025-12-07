@@ -1,86 +1,69 @@
-﻿
-@model HospitalDef.Models.Doctor
-
-@{
-    ViewData["Title"] = "Perfil del Médico";
+﻿@{
+    ViewData["Title"] = "Perfil del Paciente";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link rel="stylesheet" href="~/css/doctorIndex.css" />
 
+<link rel="stylesheet" href="~/css/doctorIndex.css" />
 
 <div class="dashboard-container">
 
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2 class="menu-title">Menú</h2>
 
-        <a class="menu-btn" asp-controller="Citas" asp-action="Index">Citas pendientes</a>
-        <a class="menu-btn" asp-controller="Doctors" asp-action="Index">Datos personales</a>
-        <a class="menu-btn" asp-controller="" asp-action="">Generar Receta</a>
+        <a class="menu-btn active" asp-controller="Home" asp-action="Index">
+            Inicio
+        </a>
+
+        <a class="menu-btn" asp-controller="Citas" asp-action="Create">
+            Agendar cita
+        </a>
+
+        <a class="menu-btn" asp-controller="Citas" asp-action="Index">
+            Mis citas
+        </a>
+
+        <a class="menu-btn" asp-controller="HistorialMedicoPacientes" asp-action="Details">
+            Datos personales
+        </a>
     </div>
 
+    <!-- CONTENIDO -->
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
 
-                    <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 fw-bold"><i class="fas fa-id-badge me-2"></i>Ficha Técnica</h4>
-                        <span class="badge bg-white text-primary">Activo</span>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+
+                    <div class="alert alert-info shadow-sm">
+                        <h4 class="alert-heading">¡Hola, @nombre!</h4>
+                        <p>
+                            Usa el menú de la izquierda para gestionar tus citas
+                            y tus datos personales.
+                        </p>
+                    </div>
+                }
+
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
+                    <div class="card-header bg-primary text-white p-4">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="fas fa-user-injured me-2"></i>
+                            Panel del Paciente
+                        </h4>
                     </div>
 
                     <div class="card-body p-5 bg-light">
-                        <div class="text-center mb-5">
-                            <div class="bg-white rounded-circle shadow-sm d-inline-flex p-4 mb-3 align-items-center justify-content-center" style="width: 120px; height: 120px;">
-                                <i class="fas fa-user-md fa-4x text-primary"></i>
-                            </div>
-
-                            <h2 class="fw-bold text-dark mb-1">
-                                Dr. @Html.DisplayFor(model => model.IdEmpleadoNavigation.Nombre)
-                                @Html.DisplayFor(model => model.IdEmpleadoNavigation.ApellidoP)
-                                @Html.DisplayFor(model => model.IdEmpleadoNavigation.ApellidoM)
-                            </h2>
-
-                            <div class="mt-2">
-                                <span class="badge bg-info text-dark fs-6 px-4 py-2 rounded-pill shadow-sm">
-                                    <i class="fas fa-stethoscope me-2"></i>@Html.DisplayFor(model => model.IdEspecialidadNavigation.Especialidades)
-                                </span>
-                            </div>
-                        </div>
-
-                        <hr class="text-muted opacity-25 mb-4">
-
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-primary h-100 position-relative overflow-hidden">
-                                    <div class="position-absolute end-0 top-0 p-3 opacity-10">
-                                        <i class="fas fa-certificate fa-3x text-primary"></i>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="text-muted fw-bold mb-0 text-uppercase tracking-wide small">Cédula Profesional</h6>
-                                    </div>
-                                    <p class="fs-4 fw-bold mb-0 text-dark font-monospace">
-                                        @Html.DisplayFor(model => model.CedulaProf)
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success h-100 position-relative overflow-hidden">
-                                    <div class="position-absolute end-0 top-0 p-3 opacity-10">
-                                        <i class="fas fa-door-open fa-3x text-success"></i>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="text-muted fw-bold mb-0 text-uppercase tracking-wide small">Consultorio Asignado</h6>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span class="fs-4 fw-bold text-dark me-2"># @Html.DisplayFor(model => model.IdConsultorioNavigation.Numero)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="lead">
+                            Bienvenido al módulo de pacientes.
+                            Selecciona una opción del menú lateral.
+                        </p>
                     </div>
-
-                    
                 </div>
+
             </div>
         </div>
     </div>
+
+</div>
