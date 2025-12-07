@@ -170,5 +170,21 @@ namespace HospitalDef.Controllers
         {
             return _context.Empleados.Any(e => e.IdEmpleado == id);
         }
+        public IActionResult DatosPersonalesDoctor()
+        {
+            var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var empleado = _context.Empleados
+                .Include(e => e.IdHorarioNavigation)
+                .Include(e => e.Doctors)
+                .FirstOrDefault(e => e.IdUsuario == usuarioId);
+
+            if (empleado == null)
+                return NotFound();
+
+            return View(empleado);
+        }
+
+
     }
 }

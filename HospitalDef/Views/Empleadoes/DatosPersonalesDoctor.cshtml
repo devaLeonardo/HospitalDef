@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Expediente del Empleado";
 }
-
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -61,7 +60,7 @@
                                     </div>
                                     <div class="col-12">
                                         <small class="text-muted d-block fw-bold text-uppercase">Sexo</small>
-                                        
+
                                         <span>@Html.DisplayFor(model => model.Sexo)</span>
                                     </div>
                                 </div>
@@ -115,34 +114,34 @@
                                             </div>
 
                                             <div class="border rounded p-2 text-center align-items-center">
-                                                
-                                                <span class="fw-bold text-primary">#@Html.DisplayFor(model => model.IdHorarioNavigation.HoraEntrada)</span>
-                                                <span class="fw-bold text-primary">#@Html.DisplayFor(model => model.IdHorarioNavigation.HoraSalida)</span>
+
+                                                <span class="fw-bold text-primary">@Html.DisplayFor(model => model.IdHorarioNavigation.HoraEntrada)</span>
+                                                <span class="fw-bold text-primary">@Html.DisplayFor(model => model.IdHorarioNavigation.HoraSalida)</span>
 
                                             </div>
-                                            
+
                                         </div>
                                         <i class="fas fa-university fa-2x text-muted opacity-25"></i>
                                     </div>
                                 </div>
 
-           
-                                    
-                                </div>
+
+
                             </div>
                         </div>
-
                     </div>
-                </div>
 
-                <div class="card-footer bg-white p-4 border-0 d-flex justify-content-between">
+                </div>
+            </div>
+
+            <div class="card-footer bg-white p-4 border-0 d-flex justify-content-between">
                 <a asp-controller="Doctors" asp-action="Index" class="btn btn-outline-secondary px-4 rounded-pill">
-                        <i class="fas fa-arrow-left me-2"></i>Volver al Modulo
-                    </a>
-
-                </div>
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Modulo
+                </a>
 
             </div>
+
         </div>
     </div>
+</div>
 </div>
