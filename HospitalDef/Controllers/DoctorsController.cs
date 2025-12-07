@@ -36,7 +36,7 @@ namespace HospitalDef.Controllers
                 .Include(d => d.IdConsultorioNavigation)
                 .Include(d => d.IdEmpleadoNavigation)
                 .Include(d => d.IdEspecialidadNavigation)
-                .FirstOrDefaultAsync(m => m.IdDoctor == idUsuario);
+                .FirstOrDefaultAsync(m => m.IdEmpleadoNavigation.IdUsuario == idUsuario);
             if (doctor == null)
             {
                 return NotFound();
