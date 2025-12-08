@@ -4,32 +4,41 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IdEmpleadoNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdEmpleadoNavigation.IdEmpleado)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdFarmaceutico">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdFarmaceutico">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdFarmaceutico">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<link rel="stylesheet" href="~/css/doctorIndex.css" />
+
+<div class="dashboard-container">
+
+    <!-- ===== Sidebar  -->
+    <div class="sidebar">
+        <h2 class="menu-title">Menú</h2>
+
+
+
+        <a class="menu-btn" asp-controller="Farmaceuticoes" asp-action="Create">
+            <i class="far fa-calendar-plus me-2"></i> Atender receta
+        </a>
+
+
+        <a class="menu-btn" asp-controller="Farmaceuticoes" asp-action="Details" asp-route-id="1">
+            <i class="far fa-calendar-plus me-2"></i> Inventario
+        </a>
+
+        <a class="menu-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecep">
+            <i class="fas fa-user-circle me-2"></i> Datos Personales
+        </a>
+    </div>
+
+    <!-- ===== Contenido central ===== -->
+    <div class="main-content">
+        <h1 class="welcome-title">
+            Bienvenido(a),
+            <span class="user-name">@User.Identity?.Name</span>
+        </h1>
+
+        <p class="welcome-subtitle">
+            Selecciona una opción del menú para comenzar.
+        </p>
+    </div>
+
+</div>

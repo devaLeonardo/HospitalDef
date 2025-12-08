@@ -185,6 +185,35 @@ namespace HospitalDef.Controllers
             return View(empleado);
         }
 
+        public IActionResult DatosPersonalesRecep()
+        {
+            var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var empleado = _context.Empleados
+                .Include(e => e.IdHorarioNavigation)
+                .Include(e => e.Recepcionista)
+                .FirstOrDefault(e => e.IdUsuario == usuarioId);
+
+            if (empleado == null)
+                return NotFound();
+
+            return View(empleado);
+        }
+        public IActionResult DatosPersonalesFar()
+        {
+            var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var empleado = _context.Empleados
+                .Include(e => e.IdHorarioNavigation)
+                .Include(e => e.Recepcionista)
+                .FirstOrDefault(e => e.IdUsuario == usuarioId);
+
+            if (empleado == null)
+                return NotFound();
+
+            return View(empleado);
+        }
+
 
     }
 }
