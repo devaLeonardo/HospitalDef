@@ -199,6 +199,7 @@ namespace HospitalDef.Controllers
 
             return View(empleado);
         }
+
         public IActionResult DatosPersonalesFar()
         {
             var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
