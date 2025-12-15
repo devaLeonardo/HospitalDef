@@ -1,0 +1,203 @@
+﻿@model IEnumerable<HospitalDef.Models.Paciente>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<div class="container mt-4">
+
+    <!-- ===== Encabezado ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-user me-2"></i> Lista de Pacientes
+        </h2>
+
+        <!-- ===== Filtro ===== -->
+        <div class="input-group w-50">
+            <span class="input-group-text bg-white">
+                <i class="fas fa-search text-secondary"></i>
+            </span>
+            <input type="text"
+                   id="filtroPaciente"
+                   class="form-control"
+                   placeholder="Buscar paciente por nombre..."
+                   onkeyup="filtrarPacientes()" />
+        </div>
+    </div>
+
+    <!-- ===== Tarjeta ===== -->
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="tablaPacientes">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Sexo</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            bool tieneCitaPendiente = p.Cita.Any(c => c.estatusAtencion == "PAGADO");
+                            bool activo = p.IdUsuarioNavigation?.Activo == true;
+
+                            <tr>
+                                <!-- ===== Nombre ===== -->
+                                <td data-nombre="@($"{p.Nombre} {p.ApellidoP} {p.ApellidoM}")">
+                                    <strong>@p.Nombre @p.ApellidoP @p.ApellidoM</strong>
+                                </td>
+
+                                <!-- ===== Sexo ===== -->
+                                <td>@p.Sexo</td>
+
+                                <!-- ===== Estado ===== -->
+                                <td>
+                                    @if (activo)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i> Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i> Inactivo
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- ===== Acciones ===== -->
+                                <td class="text-center">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@p.IdPaciente"
+                                       class="btn btn-outline-warning btn-sm me-1"
+                                       title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    @if (activo)
+                                    {
+                                        if (tieneCitaPendiente)
+                                        {
+                                            <button class="btn btn-secondary btn-sm" disabled
+                                                    title="Tiene citas pendientes">
+                                                No disponible
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Desactivar"
+                                                  asp-route-id="@p.IdUsuario"
+                                                  method="post"
+                                                  class="d-inline form-desactivar">
+                                                @Html.AntiForgeryToken()
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm btn-desactivar"
+                                                        data-nombre="@($"{p.Nombre} {p.ApellidoP} {p.ApellidoM}")">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="Activar"
+                                              asp-route-id="@p.IdUsuario"
+                                              method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-user-check"></i> Activar
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="card-footer bg-white p-4 border-0 d-flex justify-content-between">
+                <a asp-controller="Recepcionistums" asp-action="Index" class="btn btn-outline-secondary px-4 rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Módulo
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== Script del filtro ===== -->
+<script>
+    function filtrarPacientes() {
+        let input = document.getElementById("filtroPaciente");
+        let filtro = input.value.toLowerCase();
+        let filas = document.querySelectorAll("#tablaPacientes tbody tr");
+
+        filas.forEach(fila => {
+            let nombre = fila.querySelector("td[data-nombre]")
+                .getAttribute("data-nombre")
+                .toLowerCase();
+            fila.style.display = nombre.includes(filtro) ? "" : "none";
+        });
+    }
+</script>
+
+<!-- ===== SweetAlert2 ===== -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelectorAll('.btn-desactivar').forEach(boton => {
+        boton.addEventListener('click', function () {
+            const form = this.closest('form');
+            const nombre = this.getAttribute('data-nombre');
+
+            Swal.fire({
+                title: '¿Desactivar paciente?',
+                html: `El paciente <strong>${nombre}</strong> será desactivado.<br><br>
+                       <span class="text-danger">Esta acción puede revertirse.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-user-slash"></i> Sí, desactivar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+
+<!-- ===== SweetAlert mensajes backend ===== -->
+@if (TempData["Success"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: '@TempData["Success"]',
+            timer: 2500,
+            showConfirmButton: false
+        });
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'No se puede desactivar',
+            text: '@TempData["Error"]',
+            confirmButtonColor: '#d33'
+        });
+    </script>
+}

@@ -1,84 +1,153 @@
-﻿@model HospitalDef.Models.Paciente
+﻿@model IEnumerable<HospitalDef.Models.Paciente>
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Pacientes";
 }
 
-<h1>Details</h1>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div>
-    <h4>Paciente</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApellidoP)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApellidoP)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApellidoM)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApellidoM)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaNacimiento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaNacimiento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sexo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sexo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Edad)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Edad)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Calle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Calle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Colonia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Colonia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Municipio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Municipio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdUsuarioNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdUsuarioNavigation.IdUsuario)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdPaciente">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<h2 class="mb-4">Listado de Pacientes</h2>
+
+<table class="table table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Sexo</th>
+            <th>Estado del perfil</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            bool tieneCitaPendiente = p.Cita.Any(c => c.estatusAtencion == "PAGADO");
+            bool activo = p.IdUsuarioNavigation?.Activo == true;
+
+            <tr>
+                <td>
+                    @p.Nombre @p.ApellidoP @p.ApellidoM
+                </td>
+
+                <td>@p.Sexo</td>
+
+                <td>
+                    @if (activo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactivo</span>
+                    }
+                </td>
+
+                <td class="text-center">
+                    <a asp-action="Edit"
+                       asp-route-id="@p.IdPaciente"
+                       class="btn btn-warning btn-sm me-1">
+                        Editar
+                    </a>
+
+                    @if (activo)
+                    {
+                        if (tieneCitaPendiente)
+                        {
+                            <button class="btn btn-secondary btn-sm" disabled
+                                    title="Tiene citas pendientes">
+                                No disponible
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="confirmarDesactivar(@p.IdUsuario)">
+                                Desactivar
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <button class="btn btn-success btn-sm"
+                                onclick="confirmarActivar(@p.IdUsuario)">
+                            Activar
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- SweetAlert mensajes backend -->
+@if (TempData["Error"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Acción no permitida',
+            text: '@TempData["Error"]',
+            showClass: {
+                popup: 'animate__animated animate__shakeX'
+            }
+        });
+    </script>
+}
+
+@if (TempData["Success"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Operación exitosa',
+            text: '@TempData["Success"]',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    </script>
+}
+
+<!-- Funciones SweetAlert -->
+<script>
+    function confirmarDesactivar(idUsuario) {
+        Swal.fire({
+            title: '¿Desactivar paciente?',
+            text: 'No podrá agendar citas mientras esté inactivo.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, desactivar',
+            cancelButtonText: 'Cancelar',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/Pacientes/Desactivar/${idUsuario}`;
+            }
+        });
+    }
+
+    function confirmarActivar(idUsuario) {
+        Swal.fire({
+            title: '¿Activar paciente?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, activar',
+            cancelButtonText: 'Cancelar',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/Pacientes/Activar/${idUsuario}`;
+            }
+        });
+    }
+</script>
