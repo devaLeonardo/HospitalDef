@@ -4,44 +4,90 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
 
-<h4>Recetum</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center my-5">
+    <div class="col-lg-6 col-md-10 agendar-form-container">
+
+        <div class="form-header text-center mb-4">
+            <h1>Generar una receta</h1>
+            <h4>Es necesario generar una receta por cada cita </h4>
+            <hr />
+        </div>
+
+
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FolioCita" class="control-label"></label>
-                <select asp-for="FolioCita" class ="form-control" asp-items="ViewBag.FolioCita"></select>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="form-group mb-3">
+                
+                <label>Folio de la Cita:</label>
+                <input class="form-control" value="@ViewBag.FolioCita" disabled />
+                <input type="hidden" asp-for="FolioCita" value="@ViewBag.FolioCita" />
+
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Observaciones" class="control-label"></label>
-                <input asp-for="Observaciones" class="form-control" />
-                <span asp-validation-for="Observaciones" class="text-danger"></span>
+
+                <textarea asp-for="Observaciones" class="form-control border border-primary" rows="10"
+                          placeholder="Ingresa las observaciones generales (Que tiene el paciente)"></textarea>
+                
+                <span asp-validation-for="Observaciones" class="text-danger "></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Tratamientos" class="control-label"></label>
-                <input asp-for="Tratamientos" class="form-control" />
+            <div class="form-group mb-3">
+                <label asp-for="Tratamientos" class="control-label">Medicamentos</label>
+                <textarea asp-for="Tratamientos" id="tratamientos" class="form-control border border-primary" rows="10"
+                          placeholder="Ingresa los medicamentos y sus especificaciones (Presiona enter para empezar)"></textarea>
                 <span asp-validation-for="Tratamientos" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Diagnostico" class="control-label"></label>
-                <input asp-for="Diagnostico" class="form-control" />
+            <div class="form-group mb-3">
+                <label asp-for="Diagnostico" class="control-label">Indicaciones</label>
+                <textarea asp-for="Diagnostico" id="diagnostico" class="form-control border border-primary" rows="10"
+                          placeholder="Describe las indicaciones necesarias"></textarea>
                 <span asp-validation-for="Diagnostico" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="d-flex justify-content-between mt-4">
+                <input type="submit" value="Generar Receta" class="btn btn-outline-primary btn-sm" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Citas" asp-action="IndexDoctor" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i> Regresar
+    </a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tratamientosTextarea = document.getElementById("tratamientos");
+            const diagnosticoTextarea = document.getElementById("diagnostico");
+
+
+            tratamientosTextarea.addEventListener('keydown', function (e) {
+               if(e.key === 'Enter'){
+                   e.preventDefault();
+                   this.value += '\n• ';
+               }
+                
+            });
+
+            diagnosticoTextarea.addEventListener('keydown', function (e) {
+               if(e.key === 'Enter'){
+                   e.preventDefault();
+                   this.value += '\n• ';
+               }
+
+            });
+        });
+
+
+
+
+
+
+    </script>
+
 }
