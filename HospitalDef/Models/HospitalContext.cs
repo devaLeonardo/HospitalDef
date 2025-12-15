@@ -53,6 +53,8 @@ public partial class HospitalContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
     public virtual DbSet<VistaDoctorHorario> VistaDoctorHorario { get; set; }
+    public virtual DbSet<VistaDoctor> VistaDoctores { get; set; }
+
 
 
 
@@ -572,6 +574,11 @@ public partial class HospitalContext : DbContext
             .ToView("VistaDoctoresHorario");
 
         OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<VistaDoctor>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView("VistaDoctores");
+        });
 
     }
 
