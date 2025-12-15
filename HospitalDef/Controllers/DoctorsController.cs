@@ -74,61 +74,91 @@ namespace HospitalDef.Controllers
         }
 
         // GET: Doctors/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var doctor = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdDoctor == id);
 
-            var doctor = await _context.Doctors.FindAsync(id);
             if (doctor == null)
-            {
                 return NotFound();
-            }
-            ViewData["IdConsultorio"] = new SelectList(_context.Consultorios, "IdConsultorio", "IdConsultorio", doctor.IdConsultorio);
-            ViewData["IdEmpleado"] = new SelectList(_context.Empleados, "IdEmpleado", "IdEmpleado", doctor.IdEmpleado);
-            ViewData["IdEspecialidad"] = new SelectList(_context.Especialidades, "IdEspecialidad", "IdEspecialidad", doctor.IdEspecialidad);
+
+            ViewBag.IdHorario = new SelectList(
+                _context.HorarioEmpleados,
+                "IdHorario",
+                "Dias",
+                doctor.IdEmpleadoNavigation.IdHorario
+            );
+
+            ViewBag.IdEspecialidad = new SelectList(
+                _context.Especialidades,
+                "IdEspecialidad",
+                "Especialidades",
+                doctor.IdEspecialidad
+            );
+
+            ViewBag.IdConsultorio = new SelectList(
+                _context.Consultorios,
+                "IdConsultorio",
+                "Numero",
+                doctor.IdConsultorio
+            );
+
             return View(doctor);
         }
+
+
 
         // POST: Doctors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdDoctor,IdEmpleado,IdEspecialidad,IdConsultorio,CedulaProf")] Doctor doctor)
-        {
-            if (id != doctor.IdDoctor)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(doctor);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DoctorExists(doctor.IdDoctor))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdConsultorio"] = new SelectList(_context.Consultorios, "IdConsultorio", "IdConsultorio", doctor.IdConsultorio);
-            ViewData["IdEmpleado"] = new SelectList(_context.Empleados, "IdEmpleado", "IdEmpleado", doctor.IdEmpleado);
-            ViewData["IdEspecialidad"] = new SelectList(_context.Especialidades, "IdEspecialidad", "IdEspecialidad", doctor.IdEspecialidad);
-            return View(doctor);
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Doctor model)
+        {
+            var doctorDb = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdDoctor == id);
+
+            if (doctorDb == null)
+                return NotFound();
+
+            // ================= EMPLEADO =================
+            await TryUpdateModelAsync(
+                doctorDb.IdEmpleadoNavigation,
+                "IdEmpleadoNavigation",
+                e => e.Nombre,
+                e => e.ApellidoP,
+                e => e.ApellidoM,
+                e => e.Rfc,
+                e => e.CuentaBancaria,
+                e => e.Sexo,
+                e => e.Calle,
+                e => e.Colonia,
+                e => e.Municipio,
+                e => e.Estado,
+                e => e.IdHorario
+            );
+
+            // ================= DOCTOR =================
+            await TryUpdateModelAsync(
+                doctorDb,
+                "",
+                d => d.IdEspecialidad,
+                d => d.IdConsultorio,
+                d => d.CedulaProf
+            );
+
+            await _context.SaveChangesAsync();
+
+            TempData["DoctorEditado"] = true;
+
+            // 
+            return RedirectToAction("Index", "vistaDoctores");
         }
+
 
         // GET: Doctors/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -170,5 +200,44 @@ namespace HospitalDef.Controllers
         {
             return _context.Doctors.Any(e => e.IdDoctor == id);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Desactivar(int id)
+        {
+            var doctor = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdDoctor == id);
+
+            if (doctor == null)
+                return NotFound();
+
+            // VERIFICAR CITAS PENDIENTES
+            bool tieneCitasPendientes = await _context.Citas.AnyAsync(c =>
+                c.idDoctor == id &&
+                c.fechaCita >= DateTime.Today &&     // futuras o de hoy
+                c.estatusAtencion == "PAGADO"               // ajusta según tu modelo
+            );
+
+            if (tieneCitasPendientes)
+            {
+                TempData["DoctorNoDesactivado"] = true;
+                return RedirectToAction("Index", "vistaDoctores");
+            }
+
+            // ✅ DESACTIVAR
+            doctor.IdEmpleadoNavigation.Activo = false;
+            await _context.SaveChangesAsync();
+
+            TempData["DoctorDesactivado"] = true;
+            return RedirectToAction("Index", "vistaDoctores");
+        }
+
+
+
+
+
     }
+
+
 }
