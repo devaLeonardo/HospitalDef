@@ -109,8 +109,25 @@
                                             </button>
                                         </form>
                                     }
+                                    else
+                                    {
+                                        <form asp-controller="Doctors"
+                                              asp-action="Activar"
+                                              asp-route-id="@d.IdDoctor"
+                                              method="post"
+                                              class="d-inline form-activar">
 
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="button"
+                                                    class="btn btn-outline-success btn-sm btn-activar"
+                                                    data-nombre="@d.NombreCompleto">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        </form>
+                                    }
                                 </td>
+
                             </tr>
                         }
                     </tbody>
@@ -211,6 +228,47 @@
         });
     </script>
 }
+<script>
+    document.querySelectorAll('.btn-activar').forEach(boton => {
+        boton.addEventListener('click', function () {
+
+            const form = this.closest('form');
+            const nombre = this.getAttribute('data-nombre');
+
+            Swal.fire({
+                title: '¿Activar doctor?',
+                html: `El doctor <strong>${nombre}</strong> será activado.<br><br>
+                       <span class="text-success">Esta acción puede revertirse.</span>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-user-check"></i> Sí, activar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // SweetAlert de activado
+    @if (TempData["DoctorActivado"] != null)
+    {
+            <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Doctor activado',
+                    text: 'El doctor fue activado correctamente.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            </text>
+    }
+</script>
+
 
 
 
