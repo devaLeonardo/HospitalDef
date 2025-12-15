@@ -31,8 +31,11 @@ namespace HospitalDef.Controllers
         // GET: Recetums
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Receta.Include(r => r.FolioCitaNavigation);
-            return View(await hospitalContext.ToListAsync());
+            var recepcionista = _context.Recepcionista
+                .Include(r => r.IdEmpleadoNavigation)
+                .FirstOrDefault(); // o por id / usuario
+
+            return View(recepcionista);
         }
 
         // GET: Recetums/Details/5

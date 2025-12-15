@@ -61,6 +61,28 @@
                                     </p>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-primary h-100">
+                                    <h6 class="text-muted fw-bold text-uppercase small">
+                                        Horario
+                                    </h6>
+
+                                    <p class="mb-1 fw-bold text-dark">
+                                        Entrada:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.HoraEntrada
+                                    </p>
+
+                                    <p class="mb-1 fw-bold text-dark">
+                                        Salida:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.HoraSalida
+                                    </p>
+
+                                    <p class="mb-0 text-dark">
+                                        Días:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.Dias
+                                    </p>
+                                </div>
+                            </div>
 
                             <div class="col-md-6">
                                 <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success h-100 position-relative overflow-hidden">

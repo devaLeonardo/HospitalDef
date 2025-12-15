@@ -1,47 +1,115 @@
-﻿@model IEnumerable<HospitalDef.Models.Recepcionistum>
+﻿@model HospitalDef.Models.Recepcionistum
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Perfil de Recepcionista";
 }
 
 <link rel="stylesheet" href="~/css/doctorIndex.css" />
 
 <div class="dashboard-container">
 
-    <!-- ===== Sidebar  -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2 class="menu-title">Menú</h2>
 
-
-
-        <a class="menu-btn" asp-controller="Recepcionistums" asp-action="Create">
-            <i class="far fa-calendar-plus me-2"></i> Crear usuario
+        <a class="menu-btn" asp-controller="Citas" asp-action="Index">
+            Gestión de citas
         </a>
 
-
-        <a class="menu-btn" asp-controller="vistaDoctores" asp-action="Index">
-            <i class="far fa-calendar-plus me-2"></i> Visualizar doctores
+        <a class="menu-btn" asp-controller="Pacientes" asp-action="Index">
+            Pacientes
         </a>
 
-        <a class="menu-btn" asp-controller="Citas" asp-action="Create">
-            <i class="fas fa-list-alt me-2"></i> Agendar cita
-        </a>
-
-        <a class="menu-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecep">
-            <i class="fas fa-user-circle me-2"></i> Datos Personales
+        <a class="menu-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecepcionista">
+            Datos personales
         </a>
     </div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
 
-    <!-- ===== Contenido central ===== -->
-    <div class="main-content">
-        <h1 class="welcome-title">
-            Bienvenido(a),
-            <span class="user-name">@User.Identity?.Name</span>
-        </h1>
+                    <div class="card-header bg-success text-white p-4 d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="fas fa-id-badge me-2"></i>Ficha Técnica
+                        </h4>
+                        <span class="badge bg-white text-success">Activo</span>
+                    </div>
 
-        <p class="welcome-subtitle">
-            Selecciona una opción del menú para comenzar.
-        </p>
+                    <div class="card-body p-5 bg-light">
+                        <div class="text-center mb-5">
+                            <div class="bg-white rounded-circle shadow-sm d-inline-flex p-4 mb-3 align-items-center justify-content-center"
+                                 style="width: 120px; height: 120px;">
+                                <i class="fas fa-user fa-4x text-success"></i>
+                            </div>
+
+                            <h2 class="fw-bold text-dark mb-1">
+                                @Model.IdEmpleadoNavigation.Nombre
+                                @Model.IdEmpleadoNavigation.ApellidoP
+                                @Model.IdEmpleadoNavigation.ApellidoM
+                            </h2>
+
+                            <div class="mt-2">
+                                <span class="badge bg-secondary fs-6 px-4 py-2 rounded-pill shadow-sm">
+                                    <i class="fas fa-headset me-2"></i>Recepcionista
+                                </span>
+                            </div>
+                        </div>
+
+                        <hr class="text-muted opacity-25 mb-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success h-100">
+                                    <h6 class="text-muted fw-bold text-uppercase small">
+                                        RFC
+                                    </h6>
+                                    <p class="fs-5 fw-bold mb-0 text-dark font-monospace">
+                                        @Model.IdEmpleadoNavigation.Rfc
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-primary h-100">
+                                    <h6 class="text-muted fw-bold text-uppercase small">
+                                        Horario
+                                    </h6>
+
+                                    <p class="mb-1 fw-bold text-dark">
+                                        Entrada:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.HoraEntrada
+                                    </p>
+
+                                    <p class="mb-1 fw-bold text-dark">
+                                        Salida:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.HoraSalida
+                                    </p>
+
+                                    <p class="mb-0 text-dark">
+                                        Días:
+                                        @Model.IdEmpleadoNavigation.IdHorarioNavigation.Dias
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-warning h-100">
+                                    <h6 class="text-muted fw-bold text-uppercase small">
+                                        Dirección
+                                    </h6>
+                                    <p class="mb-0 text-dark">
+                                        @Model.IdEmpleadoNavigation.Calle,
+                                        @Model.IdEmpleadoNavigation.Colonia,
+                                        @Model.IdEmpleadoNavigation.Municipio,
+                                        @Model.IdEmpleadoNavigation.Estado
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>

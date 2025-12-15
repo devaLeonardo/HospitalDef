@@ -31,16 +31,17 @@ namespace HospitalDef.Controllers
 
             int idUsuario = int.Parse(userId);
 
-
             var doctor = await _context.Doctors
-                .Include(d => d.IdConsultorioNavigation)
                 .Include(d => d.IdEmpleadoNavigation)
+                    .ThenInclude(e => e.IdHorarioNavigation)
                 .Include(d => d.IdEspecialidadNavigation)
-                .FirstOrDefaultAsync(m => m.IdEmpleadoNavigation.IdUsuario == idUsuario);
+                .Include(d => d.IdConsultorioNavigation)
+                .FirstOrDefaultAsync(d =>
+                    d.IdEmpleadoNavigation.IdUsuario == idUsuario
+                );
+
             if (doctor == null)
-            {
                 return NotFound();
-            }
 
             return View(doctor);
         }
