@@ -23,25 +23,24 @@ namespace HospitalDef.Controllers
         // GET: Pacientes
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Pacientes.Include(p => p.IdUsuarioNavigation);
-            return View(await hospitalContext.ToListAsync());
+            var pacientes = _context.Pacientes
+                .Include(p => p.IdUsuarioNavigation);
+
+            return View(await pacientes.ToListAsync());
         }
 
         // GET: Pacientes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var paciente = await _context.Pacientes
                 .Include(p => p.IdUsuarioNavigation)
                 .FirstOrDefaultAsync(m => m.IdPaciente == id);
+
             if (paciente == null)
-            {
                 return NotFound();
-            }
 
             return View(paciente);
         }
@@ -182,7 +181,8 @@ namespace HospitalDef.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
+                TempData["Guardado"] = "Cambios guardados correctamente";
+                return RedirectToAction("ListadoPacientes","Pacientes");
             }
            
             return View(paciente);
@@ -228,6 +228,17 @@ namespace HospitalDef.Controllers
             return _context.Pacientes.Any(e => e.IdPaciente == id);
         }
 
+
+        public async Task<IActionResult> ListadoPacientes()
+        {
+            var pacientes = await _context.Pacientes
+                .Include(p => p.IdUsuarioNavigation)
+                .Include(p => p.Cita)
+                .ToListAsync();
+
+            return View(pacientes);
+        }
+
         //metodo para calcular edad
         private int CalcularEdad(DateOnly fechaNacimiento)
         {
@@ -240,5 +251,49 @@ namespace HospitalDef.Controllers
 
             return edad;
         }
+        public async Task<IActionResult> Desactivar(int id)
+        {
+            // id = IdUsuario
+            var usuario = await _context.Usuarios
+                .Include(u => u.Pacientes)
+                    .ThenInclude(p => p.Cita)
+                .FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+            if (usuario == null)
+                return NotFound();
+
+            // Verificar citas pendientes
+            bool tieneCitaPendiente = usuario.Pacientes
+                .SelectMany(p => p.Cita)
+                .Any(c => c.estatusAtencion == "PAGADO");
+
+            if (tieneCitaPendiente)
+            {
+                TempData["Error"] = "No se puede desactivar el perfil porque el paciente tiene citas pendientes.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            usuario.Activo = false;
+            _context.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Paciente desactivado correctamente.";
+            return RedirectToAction("ListadoPacientes");
+        }
+
+        public async Task<IActionResult> Activar(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            usuario.Activo = true;
+            _context.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ListadoPacientes");
+        }
+
     }
 }

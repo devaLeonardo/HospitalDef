@@ -31,16 +31,17 @@ namespace HospitalDef.Controllers
 
             int idUsuario = int.Parse(userId);
 
-
             var doctor = await _context.Doctors
-                .Include(d => d.IdConsultorioNavigation)
                 .Include(d => d.IdEmpleadoNavigation)
+                    .ThenInclude(e => e.IdHorarioNavigation)
                 .Include(d => d.IdEspecialidadNavigation)
-                .FirstOrDefaultAsync(m => m.IdEmpleadoNavigation.IdUsuario == idUsuario);
+                .Include(d => d.IdConsultorioNavigation)
+                .FirstOrDefaultAsync(d =>
+                    d.IdEmpleadoNavigation.IdUsuario == idUsuario
+                );
+
             if (doctor == null)
-            {
                 return NotFound();
-            }
 
             return View(doctor);
         }
@@ -225,7 +226,7 @@ namespace HospitalDef.Controllers
                 return RedirectToAction("Index", "vistaDoctores");
             }
 
-            // ✅ DESACTIVAR
+            //  DESACTIVAR
             doctor.IdEmpleadoNavigation.Activo = false;
             await _context.SaveChangesAsync();
 
@@ -233,11 +234,24 @@ namespace HospitalDef.Controllers
             return RedirectToAction("Index", "vistaDoctores");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activar(int id)
+        {
+            var doctor = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdDoctor == id);
 
+            if (doctor == null)
+                return NotFound();
 
+            // Activar
+            doctor.IdEmpleadoNavigation.Activo = true;
+            await _context.SaveChangesAsync();
 
-
+            TempData["DoctorActivado"] = true;
+            return RedirectToAction("Index", "vistaDoctores");
+        }
     }
-
 
 }

@@ -19,6 +19,21 @@ namespace HospitalDef.Controllers
             _context = context;
         }
 
+
+
+        //empleado y recepcionista
+        public async Task<IActionResult> FarmaceuticosYRecepcionistas()
+        {
+            var empleados = await _context.Empleados
+                .Include(e => e.Farmaceutico)
+                .Include(e => e.Recepcionista)
+                .Where(e => e.Farmaceutico != null || e.Recepcionista != null)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(empleados);
+        }
+
         // GET: Empleadoes
         public async Task<IActionResult> Index()
         {

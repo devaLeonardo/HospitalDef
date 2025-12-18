@@ -39,11 +39,12 @@ public partial class Empleado
 
     public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
 
-    public virtual ICollection<Farmaceutico> Farmaceuticos { get; set; } = new List<Farmaceutico>();
+    public virtual ICollection<Farmaceutico> Farmaceutico { get; set; } = new List<Farmaceutico>();
 
     public virtual HorarioEmpleado? IdHorarioNavigation { get; set; }
 
     public virtual Usuario? IdUsuarioNavigation { get; set; }
 
     public virtual ICollection<Recepcionistum> Recepcionista { get; set; } = new List<Recepcionistum>();
+
 }

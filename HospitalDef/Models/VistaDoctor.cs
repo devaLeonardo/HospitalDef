@@ -17,5 +17,6 @@
         public string Consultorio { get; set; }
         public int? IdConsultorio { get; set; }
         public bool? Activo { get; set; }
+
     }
 }

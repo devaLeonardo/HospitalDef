@@ -62,6 +62,7 @@ namespace HospitalDef.Controllers
                            .ToListAsync();
                 citas = citasDoc;
 
+
             }
             if(role.Equals("Paciente"))
             {

@@ -31,7 +31,7 @@ public partial class HospitalContext : DbContext
 
     public virtual DbSet<Especialidade> Especialidades { get; set; }
 
-    public virtual DbSet<Farmaceutico> Farmaceuticos { get; set; }
+    public virtual DbSet<Farmaceutico> Farmaceutico { get; set; }
 
     public virtual DbSet<HistorialCitasMedicoPaciente> HistorialCitasMedicoPacientes { get; set; }
 
@@ -314,7 +314,7 @@ public partial class HospitalContext : DbContext
             entity.Property(e => e.IdFarmaceutico).HasColumnName("idFarmaceutico");
             entity.Property(e => e.IdEmpleado).HasColumnName("idEmpleado");
 
-            entity.HasOne(d => d.IdEmpleadoNavigation).WithMany(p => p.Farmaceuticos)
+            entity.HasOne(d => d.IdEmpleadoNavigation).WithMany(p => p.Farmaceutico)
                 .HasForeignKey(d => d.IdEmpleado)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_Farmaceutico_Empleado");

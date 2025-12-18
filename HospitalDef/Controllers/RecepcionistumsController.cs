@@ -21,8 +21,12 @@ namespace HospitalDef.Controllers
         // GET: Recepcionistums
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Recepcionista.Include(r => r.IdEmpleadoNavigation);
-            return View(await hospitalContext.ToListAsync());
+            var recepcionista = await _context.Recepcionista
+                .Include(r => r.IdEmpleadoNavigation)
+                    .ThenInclude(e => e.IdHorarioNavigation)
+                .FirstOrDefaultAsync();
+
+            return View(recepcionista);
         }
 
         // GET: Recepcionistums/Details/5

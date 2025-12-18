@@ -84,6 +84,8 @@
 
                                 <!-- ===== Acciones ===== -->
                                 <td class="text-center">
+
+                                    <!-- EDITAR (siempre disponible) -->
                                     <a asp-controller="Doctors"
                                        asp-action="Edit"
                                        asp-route-id="@d.IdDoctor"
@@ -94,6 +96,7 @@
 
                                     @if (d.Activo == true)
                                     {
+                                        <!-- DESACTIVAR -->
                                         <form asp-controller="Doctors"
                                               asp-action="Desactivar"
                                               asp-route-id="@d.IdDoctor"
@@ -104,13 +107,24 @@
 
                                             <button type="button"
                                                     class="btn btn-outline-danger btn-sm btn-desactivar"
-                                                    data-nombre="@d.NombreCompleto">
+                                                    data-nombre="@d.NombreCompleto"
+                                                    title="Desactivar doctor">
                                                 <i class="fas fa-user-slash"></i>
                                             </button>
                                         </form>
                                     }
+                                    else
+                                    {
+                                        <!-- NO DISPONIBLE -->
+                                        <span class="btn btn-outline-secondary btn-sm disabled"
+                                              title="Doctor no disponible">
+                                            <i class="fas fa-ban me-1"></i> No disponible
+                                        </span>
+                                    }
 
                                 </td>
+
+
                             </tr>
                         }
                     </tbody>
@@ -211,6 +225,47 @@
         });
     </script>
 }
+<script>
+    document.querySelectorAll('.btn-activar').forEach(boton => {
+        boton.addEventListener('click', function () {
+
+            const form = this.closest('form');
+            const nombre = this.getAttribute('data-nombre');
+
+            Swal.fire({
+                title: '¿Activar doctor?',
+                html: `El doctor <strong>${nombre}</strong> será activado.<br><br>
+                       <span class="text-success">Esta acción puede revertirse.</span>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-user-check"></i> Sí, activar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // SweetAlert de activado
+    @if (TempData["DoctorActivado"] != null)
+    {
+            <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Doctor activado',
+                    text: 'El doctor fue activado correctamente.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            </text>
+    }
+</script>
+
 
 
 

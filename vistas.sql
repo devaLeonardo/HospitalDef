@@ -54,6 +54,7 @@ SELECT * FROM VistaDoctores
 
 
 
+
 CREATE VIEW VistaPacientes AS
 SELECT 
     p.idPaciente,

@@ -103,7 +103,7 @@ namespace HospitalDef.Controllers
             if (empleado != null)
             {
                 doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.IdEmpleado == empleado.IdEmpleado);
-                farmaceutico = await _context.Farmaceuticos.FirstOrDefaultAsync(f => f.IdEmpleado == empleado.IdEmpleado);
+                farmaceutico = await _context.Farmaceutico.FirstOrDefaultAsync(f => f.IdEmpleado == empleado.IdEmpleado);
                 recepcionista = await _context.Recepcionista.FirstOrDefaultAsync(r => r.IdEmpleado == empleado.IdEmpleado);
             }
 
