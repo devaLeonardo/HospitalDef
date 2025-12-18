@@ -84,6 +84,8 @@
 
                                 <!-- ===== Acciones ===== -->
                                 <td class="text-center">
+
+                                    <!-- EDITAR (siempre disponible) -->
                                     <a asp-controller="Doctors"
                                        asp-action="Edit"
                                        asp-route-id="@d.IdDoctor"
@@ -94,6 +96,7 @@
 
                                     @if (d.Activo == true)
                                     {
+                                        <!-- DESACTIVAR -->
                                         <form asp-controller="Doctors"
                                               asp-action="Desactivar"
                                               asp-route-id="@d.IdDoctor"
@@ -104,29 +107,23 @@
 
                                             <button type="button"
                                                     class="btn btn-outline-danger btn-sm btn-desactivar"
-                                                    data-nombre="@d.NombreCompleto">
+                                                    data-nombre="@d.NombreCompleto"
+                                                    title="Desactivar doctor">
                                                 <i class="fas fa-user-slash"></i>
                                             </button>
                                         </form>
                                     }
                                     else
                                     {
-                                        <form asp-controller="Doctors"
-                                              asp-action="Activar"
-                                              asp-route-id="@d.IdDoctor"
-                                              method="post"
-                                              class="d-inline form-activar">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <button type="button"
-                                                    class="btn btn-outline-success btn-sm btn-activar"
-                                                    data-nombre="@d.NombreCompleto">
-                                                <i class="fas fa-user-check"></i>
-                                            </button>
-                                        </form>
+                                        <!-- NO DISPONIBLE -->
+                                        <span class="btn btn-outline-secondary btn-sm disabled"
+                                              title="Doctor no disponible">
+                                            <i class="fas fa-ban me-1"></i> No disponible
+                                        </span>
                                     }
+
                                 </td>
+
 
                             </tr>
                         }

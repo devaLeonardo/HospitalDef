@@ -21,7 +21,7 @@ namespace HospitalDef.Controllers
         // GET: Farmaceuticoes
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Farmaceuticos.Include(f => f.IdEmpleadoNavigation);
+            var hospitalContext = _context.Farmaceutico.Include(f => f.IdEmpleadoNavigation);
             return View(await hospitalContext.ToListAsync());
         }
 
@@ -33,7 +33,7 @@ namespace HospitalDef.Controllers
                 return NotFound();
             }
 
-            var farmaceutico = await _context.Farmaceuticos
+            var farmaceutico = await _context.Farmaceutico
                 .Include(f => f.IdEmpleadoNavigation)
                 .FirstOrDefaultAsync(m => m.IdFarmaceutico == id);
             if (farmaceutico == null)
@@ -76,7 +76,7 @@ namespace HospitalDef.Controllers
                 return NotFound();
             }
 
-            var farmaceutico = await _context.Farmaceuticos.FindAsync(id);
+            var farmaceutico = await _context.Farmaceutico.FindAsync(id);
             if (farmaceutico == null)
             {
                 return NotFound();
@@ -129,7 +129,7 @@ namespace HospitalDef.Controllers
                 return NotFound();
             }
 
-            var farmaceutico = await _context.Farmaceuticos
+            var farmaceutico = await _context.Farmaceutico
                 .Include(f => f.IdEmpleadoNavigation)
                 .FirstOrDefaultAsync(m => m.IdFarmaceutico == id);
             if (farmaceutico == null)
@@ -145,10 +145,10 @@ namespace HospitalDef.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var farmaceutico = await _context.Farmaceuticos.FindAsync(id);
+            var farmaceutico = await _context.Farmaceutico.FindAsync(id);
             if (farmaceutico != null)
             {
-                _context.Farmaceuticos.Remove(farmaceutico);
+                _context.Farmaceutico.Remove(farmaceutico);
             }
 
             await _context.SaveChangesAsync();
@@ -157,7 +157,7 @@ namespace HospitalDef.Controllers
 
         private bool FarmaceuticoExists(int id)
         {
-            return _context.Farmaceuticos.Any(e => e.IdFarmaceutico == id);
+            return _context.Farmaceutico.Any(e => e.IdFarmaceutico == id);
         }
     }
 }

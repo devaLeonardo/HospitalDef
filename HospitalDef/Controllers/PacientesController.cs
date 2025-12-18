@@ -181,7 +181,8 @@ namespace HospitalDef.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
+                TempData["Guardado"] = "Cambios guardados correctamente";
+                return RedirectToAction("ListadoPacientes","Pacientes");
             }
            
             return View(paciente);

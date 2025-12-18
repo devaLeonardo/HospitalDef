@@ -19,14 +19,9 @@
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <input type="hidden" asp-for="IdPaciente" />
+                <input type="hidden" asp-for="IdUsuario" />
 
                 <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <label asp-for="IdUsuario" class="form-label">Usuario</label>
-                        <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.IdUsuario"></select>
-                        <span asp-validation-for="IdUsuario" class="text-danger"></span>
-                    </div>
 
                     <div class="col-md-6">
                         <label asp-for="Nombre" class="form-label">Nombre</label>
@@ -94,7 +89,7 @@
                     <a asp-action="ListadoPacientes" class="btn btn-outline-secondary rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i> Volver
                     </a>
-                    <button type="submit" class="btn btn-primary rounded-pill">
+                    <button type="submit" class="btn btn-outline-success">
                         <i class="fas fa-save me-2"></i> Guardar Cambios
                     </button>
                 </div>
@@ -108,4 +103,36 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const fechaInput = document.getElementById("FechaNacimiento");
+            const edadInput = document.getElementById("Edad");
+
+            function calcularEdad(fecha) {
+                const hoy = new Date();
+                const nacimiento = new Date(fecha);
+
+                let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                const mes = hoy.getMonth() - nacimiento.getMonth();
+
+                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                    edad--;
+                }
+
+                return edad;
+            }
+
+            fechaInput.addEventListener("change", function () {
+                if (this.value) {
+                    edadInput.value = calcularEdad(this.value);
+                } else {
+                    edadInput.value = "";
+                }
+            });
+
+        });
+    </script>
 }
+
+

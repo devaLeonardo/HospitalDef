@@ -1,0 +1,298 @@
+﻿@model HospitalDef.Models.Usuario
+
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i> Crear Usuario
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-controller="Usuarios" asp-action="CreateUsuario" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Tipo -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tipo de usuario</label>
+                            <select name="TipoUsuario" id="TipoUsuario" class="form-select">
+                                <option value="">Seleccione...</option>
+                                <option value="Paciente">Paciente</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Recepcionista">Recepcionista</option>
+                                <option value="Farmaceutico">Farmacéutico</option>
+                            </select>
+                        </div>
+
+                        <hr />
+
+                        <!-- Usuario -->
+                        <h5 class="text-primary fw-bold mb-3">Datos de Usuario</h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input asp-for="Correo" class="form-control" placeholder="Correo" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="Contraseña" type="password" class="form-control" placeholder="Contraseña" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="NombreUsuario" class="form-control" placeholder="Nombre de usuario" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="Telefono" class="form-control" placeholder="Teléfono" required />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Personales -->
+                        <h5 class="text-primary fw-bold mb-3">Datos Personales</h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input name="Nombre" class="form-control" placeholder="Nombre" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input name="ApellidoP" class="form-control" placeholder="Apellido Paterno" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input name="ApellidoM" class="form-control" placeholder="Apellido Materno" required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <input name="FechaNacimiento" id="FechaNacimiento" type="date" class="form-control" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input name="Edad" id="Edad" readonly class="form-control" placeholder="Edad" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input name="Sexo" class="form-control" placeholder="Sexo" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <input name="Calle" class="form-control" placeholder="Calle" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input name="Colonia" class="form-control" placeholder="Colonia" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input name="Municipio" class="form-control" placeholder="Municipio" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input name="Estado" class="form-control" placeholder="Estado" required />
+                            </div>
+                        </div>
+                        <div id="empleadoExtraSection" style="display:none;">
+                            <hr />
+                            <h5 class="text-primary fw-bold">Datos Laborales</h5>
+
+                            <input name="Rfc"
+                                   id="Rfc"
+                                   class="form-control mb-2"
+                                   placeholder="RFC" />
+
+                            <input name="CuentaBancaria"
+                                   id="CuentaBancaria"
+                                   class="form-control"
+                                   placeholder="Cuenta bancaria" />
+                        </div>
+
+
+
+                        <!-- Doctor -->
+                        <div id="doctorSection" style="display:none;">
+                            <h5 class="text-primary fw-bold">Datos de Doctor</h5>
+
+                            <input name="CedulaProf" id="CedulaProf"
+                                   class="form-control mb-2"
+                                   placeholder="Cédula Profesional" />
+
+                            <select name="IdEspecialidad" id="IdEspecialidad" class="form-select mb-2">
+                                <option value="">Seleccione especialidad</option>
+                                @foreach (var e in ViewBag.Especialidades)
+                                {
+                                    <option value="@e.IdEspecialidad">@e.Especialidades</option>
+                                }
+                            </select>
+
+                            <select name="IdConsultorio" id="IdConsultorio" class="form-select mb-2">
+                                <option value="">Seleccione consultorio</option>
+                                @foreach (var c in ViewBag.Consultorios)
+                                {
+                                    <option value="@c.IdConsultorio">
+                                        Edificio @c.Edificio - Planta @c.Planta - Núm @c.Numero
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+
+                        <!-- Horarios -->
+                        <div id="horarioSection" class="mt-4" style="display:none;">
+                            <hr />
+                            <h5 class="text-primary fw-bold">Horario de Trabajo</h5>
+
+                            <select name="IdHorario" class="form-select">
+                                <option value="">Seleccione un horario</option>
+                                @foreach (var h in ViewBag.Horarios)
+                                {
+                                    <option value="@h.IdHorario">
+                                        @h.Dias — @h.HoraEntrada - @h.HoraSalida
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <hr />
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <!-- Volver -->
+                            <a asp-controller="Recepcionistums"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-arrow-left me-2"></i> Volver
+                            </a>
+
+                            <!-- Crear -->
+                            <button type="submit"
+                                    class="btn btn-outline-success rounded-pill px-4"
+                                    id="btnSubmit">
+                                <i class="fas fa-save me-2"></i> Crear Usuario
+                            </button>
+                        </div>
+
+                    </form>
+                    <hr />
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const tipoUsuario = document.getElementById("TipoUsuario");
+    const doctorSection = document.getElementById("doctorSection");
+    const horarioSection = document.getElementById("horarioSection");
+    const empleadoExtraSection = document.getElementById("empleadoExtraSection");
+
+    const fechaNacimiento = document.getElementById("FechaNacimiento");
+    const edadInput = document.getElementById("Edad");
+
+    const form = document.querySelector("form");
+
+    /* MOSTRAR / OCULTAR SECCIONES */
+    tipoUsuario.addEventListener("change", function () {
+
+        const tipo = this.value;
+        const esEmpleado = (tipo === "Doctor" || tipo === "Recepcionista" || tipo === "Farmaceutico");
+
+        doctorSection.style.display = (tipo === "Doctor") ? "block" : "none";
+        horarioSection.style.display = esEmpleado ? "block" : "none";
+        empleadoExtraSection.style.display = esEmpleado ? "block" : "none";
+    });
+
+    /* CALCULAR EDAD (PARA TODOS) */
+    fechaNacimiento.addEventListener("change", function () {
+
+        if (!this.value) return;
+
+        const fecha = new Date(this.value);
+        const hoy = new Date();
+
+        let edad = hoy.getFullYear() - fecha.getFullYear();
+        const mes = hoy.getMonth() - fecha.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
+            edad--;
+        }
+
+        edadInput.value = edad >= 0 ? edad : "";
+    });
+
+    /* SOLO NÚMEROS */
+    function soloNumeros(input) {
+        if (!input) return;
+        input.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "");
+        });
+    }
+
+    /* ALFANUMÉRICO */
+    function alfanumerico(input) {
+        if (!input) return;
+        input.addEventListener("input", function () {
+            this.value = this.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        });
+    }
+
+    soloNumeros(document.querySelector("input[placeholder='Teléfono']"));
+    alfanumerico(document.getElementById("Rfc"));
+    alfanumerico(document.getElementById("CuentaBancaria"));
+    alfanumerico(document.getElementById("CedulaProf"));
+
+    /* VALIDACIÓN TOTAL AL ENVIAR */
+    form.addEventListener("submit", function (e) {
+
+        const tipo = tipoUsuario.value;
+
+        form.addEventListener("submit", function (e) {
+
+            const campos = form.querySelectorAll("[required]");
+
+            for (let campo of campos) {
+
+                if (campo.closest("[style*='display: none']")) {
+                    continue; // ignorar secciones ocultas
+                }
+
+                if (!campo.value.trim()) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Campos incompletos",
+                        text: "Todos los campos obligatorios deben ser llenados",
+                        confirmButtonColor: "#3085d6"
+                    });
+
+                    campo.focus();
+                    return;
+                }
+            }
+        });
+
+
+
+        Swal.fire({
+            icon: "success",
+            title: "Usuario creado",
+            text: "El usuario fue creado correctamente",
+            timer: 1500,
+            showConfirmButton: false
+        });
+    });
+
+});
+</script>
+}
+
+
+
+}

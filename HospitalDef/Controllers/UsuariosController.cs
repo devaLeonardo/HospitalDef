@@ -64,6 +64,112 @@ namespace HospitalDef.Controllers
             return View(usuario);
         }
 
+
+
+        // GET: Usuarios/CreateUsuario
+        [HttpGet]
+        public IActionResult CreateUsuario()
+        {
+            ViewBag.Especialidades = _context.Especialidades.ToList();
+            ViewBag.Consultorios = _context.Consultorios.ToList();
+            ViewBag.Horarios = _context.HorarioEmpleados.ToList();
+            return View();
+        }
+
+
+        // POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateUsuario(Usuario usuario)
+        {
+            string tipo = Request.Form["TipoUsuario"];
+
+            usuario.FechaRegistro = DateTime.Now;
+            usuario.Activo = true;
+
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            if (tipo == "Paciente")
+            {
+                var paciente = new Paciente
+                {
+                    IdUsuario = usuario.IdUsuario,
+                    Nombre = Request.Form["Nombre"],
+                    ApellidoP = Request.Form["ApellidoP"],
+                    ApellidoM = Request.Form["ApellidoM"],
+                    FechaNacimiento = DateOnly.Parse(Request.Form["FechaNacimiento"]),
+                    Edad = CalcularEdad(DateOnly.Parse(Request.Form["FechaNacimiento"])),
+                    Sexo = Request.Form["Sexo"],
+                    Calle = Request.Form["Calle"],
+                    Colonia = Request.Form["Colonia"],
+                    Municipio = Request.Form["Municipio"],
+                    Estado = Request.Form["Estado"]
+                };
+
+                _context.Pacientes.Add(paciente);
+            }
+            else
+            {
+                var empleado = new Empleado
+                {
+                    IdUsuario = usuario.IdUsuario,
+                    IdHorario = int.Parse(Request.Form["IdHorario"]),
+                    Nombre = Request.Form["Nombre"],
+                    ApellidoP = Request.Form["ApellidoP"],
+                    ApellidoM = Request.Form["ApellidoM"],
+                    FechaNacimiento = DateOnly.Parse(Request.Form["FechaNacimiento"]),
+                    Edad = CalcularEdad(DateOnly.Parse(Request.Form["FechaNacimiento"])),
+                    Sexo = Request.Form["Sexo"],
+                    Calle = Request.Form["Calle"],
+                    Colonia = Request.Form["Colonia"],
+                    Municipio = Request.Form["Municipio"],
+                    Estado = Request.Form["Estado"],
+                    Rfc = Request.Form["Rfc"],
+                    CuentaBancaria = Request.Form["CuentaBancaria"],
+                    Activo = true
+                };
+
+                _context.Empleados.Add(empleado);
+                await _context.SaveChangesAsync();
+
+                if (tipo == "Doctor")
+                {
+                    _context.Doctors.Add(new Doctor
+                    {
+                        IdEmpleado = empleado.IdEmpleado,
+                        CedulaProf = Request.Form["CedulaProf"],
+                        IdEspecialidad = int.Parse(Request.Form["IdEspecialidad"]),
+                        IdConsultorio = int.Parse(Request.Form["IdConsultorio"])
+                    });
+                }
+
+                if (tipo == "Recepcionista")
+                    _context.Recepcionista.Add(new Recepcionistum
+                    {
+                        IdEmpleado = empleado.IdEmpleado
+                    });
+
+                if (tipo == "Farmaceutico")
+                    _context.Farmaceutico.Add(new Farmaceutico
+                    {
+                        IdEmpleado = empleado.IdEmpleado
+                    });
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Recepcionistums");
+        }
+
+        private int CalcularEdad(DateOnly fecha)
+        {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+            int edad = hoy.Year - fecha.Year;
+            if (fecha > hoy.AddYears(-edad)) edad--;
+            return edad;
+        }
+
+
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

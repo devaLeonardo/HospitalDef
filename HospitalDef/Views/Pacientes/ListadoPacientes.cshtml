@@ -175,6 +175,17 @@
         });
     });
 </script>
+@if (TempData["Guardado"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["Guardado"]',
+            confirmButtonColor: '#0d6efd'
+        });
+    </script>
+}
 
 <!-- ===== SweetAlert mensajes backend ===== -->
 @if (TempData["Success"] != null)

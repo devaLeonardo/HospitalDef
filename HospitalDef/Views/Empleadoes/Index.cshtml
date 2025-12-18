@@ -1,119 +1,93 @@
 ﻿@model IEnumerable<HospitalDef.Models.Empleado>
 
-@{
-    ViewData["Title"] = "Index";
-}
+<div class="container mt-4">
 
-<h1>Index</h1>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-people-fill"></i> Empleados
+        </h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Rfc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CuentaBancaria)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ApellidoP)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ApellidoM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaNacimiento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sexo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Edad)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Calle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Colonia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Municipio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdHorarioNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdUsuarioNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rfc)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CuentaBancaria)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ApellidoP)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ApellidoM)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaNacimiento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Sexo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Edad)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Calle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Colonia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Municipio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Activo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdHorarioNavigation.IdHorario)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdUsuarioNavigation.IdUsuario)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdEmpleado">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdEmpleado">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdEmpleado">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <!-- BUSCADOR -->
+        <input type="text"
+               id="buscador"
+               class="form-control w-25"
+               placeholder="Buscar por nombre o rol...">
+    </div>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+
+            <table class="table table-hover align-middle" id="tablaEmpleados">
+                <thead class="table-light">
+                    <tr>
+                        <th>Empleado</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var empleado in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>
+                                    @empleado.Nombre @empleado.ApellidoP @empleado.ApellidoM
+                                </strong>
+                            </td>
+
+                            <!-- ROL -->
+                            <td>
+                                @if (empleado.Farmaceutico != null)
+                                {
+                                    <span class="badge bg-success">Farmacéutico</span>
+                                }
+                                @if (empleado.Recepcionista != null)
+                                {
+                                    <span class="badge bg-info text-dark">Recepcionista</span>
+                                }
+                            </td>
+
+                        <!-- ESTADO -->
+                            <td>
+                                @if (empleado.Activo== true)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i> Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i> Inactivo
+                                    </span>
+                                }
+                            </td>
+                            <!-- ACCIONES -->
+                            <td>
+                                <a asp-action="Edit"
+                                   asp-route-id="@empleado.IdEmpleado"
+                                   class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                                        }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("buscador").addEventListener("keyup", function () {
+        let filtro = this.value.toLowerCase();
+        let filas = document.querySelectorAll("#tablaEmpleados tbody tr");
+
+        filas.forEach(fila => {
+            let texto = fila.innerText.toLowerCase();
+            fila.style.display = texto.includes(filtro) ? "" : "none";
+        });
+    });
+</script>
