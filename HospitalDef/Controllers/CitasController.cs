@@ -532,6 +532,99 @@ namespace HospitalDef.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AtenderCita(int folio)
+        {
+            try
+            {
+                var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == folio);
+
+                if (cita == null)
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita no existe" });
+                }
+
+
+                if (cita.estatusAtencion.Contains("Atendida"))
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita ya fue atendida" });
+                }
+
+                if (cita.fechaCita.Date > DateTime.Today)
+                {
+                   return Json(new { ok = false, mensaje = "No puedes atender una cita antes de su fecha programada." });
+                }
+
+
+                if ((cita.estatusAtencion.Contains("pendiente") && cita.estatusAtencion.Contains("pago")) ||
+                    cita.estatusAtencion.Contains("Cancelada"))
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita NO ha sido pagada previamente o ha sido cancelada" });
+
+                }
+
+                cita.estatusAtencion = "Atendida";
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { ok = true, mensaje = "La cita ha sido Atendida con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, mensaje = "ERROR SERVIDOR: " + ex.Message });
+            }
+        }
+
+
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarCita(int folio)
+        {
+            try
+            {
+                var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == folio);
+
+                if (cita == null)
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita no existe" });
+                }
+
+
+                if (cita.estatusAtencion.Contains("Atendida"))
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita ya fue atendida" });
+                }
+
+
+
+                if (
+                    cita.estatusAtencion.Contains("Cancelada")) 
+                {
+
+                    return Json(new { ok = false, mensaje = "La cita NO ha sido pagada previamente o ha sido cancelada" });
+
+                }
+
+                cita.estatusAtencion = "Cancelada por el Doctor";
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { ok = true, mensaje = "La cita ha sido Atendida con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, mensaje = "ERROR SERVIDOR: " + ex.Message });
+            }
+        }
 
 
 

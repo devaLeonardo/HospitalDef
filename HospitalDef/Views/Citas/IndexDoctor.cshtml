@@ -174,7 +174,7 @@
                 // VALIDACIÓN MÁS AMPLIA
                 // Buscamos "PAG" (cubre Pagado, Pagada, Pago)
                 // Buscamos "CANCEL" (cubre Cancelado, Cancelada)
-                if (estatusTexto.includes("ATENDIDA") || estatusTexto.includes("CANCEL")) {
+                if (estatusTexto.includes("CANCEL")) {
 
                     Swal.fire({
                         icon: 'error',
@@ -207,7 +207,7 @@
 
 
     
-    <script>
+   <script>
         //PARA ATENDIDA
         $(document).ready(function () {
 
@@ -226,11 +226,11 @@
                 var textoSucio = fila.find('.columna-estatus').text();
                 var estatusTexto = textoSucio.trim().toUpperCase();
 
-                if (estatusTexto.includes("AGENDADA") || estatusTexto.includes("CANCEL") || estatusTexto.includes("ATENDIDA") ) {
+                if (estatusTexto.includes("AGENDADA") || estatusTexto.includes("CANCEL")) {
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'No se puede atender esta cita',
+                        title: 'No se puede Proceder con esta cita',
                         text: 'El estatus actual es: ' + estatusTexto,
                         confirmButtonColor: '#3085d6'
                     });

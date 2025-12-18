@@ -38,6 +38,14 @@ namespace HospitalDef.Controllers
             return View(recepcionista);
         }
 
+
+        
+
+
+
+
+
+
         // GET: Recetums/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -82,6 +90,7 @@ namespace HospitalDef.Controllers
 
             return View();
         }
+
 
         // POST: Recetums/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
