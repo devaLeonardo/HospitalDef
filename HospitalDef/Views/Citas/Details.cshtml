@@ -1,66 +1,180 @@
 ﻿@model HospitalDef.Models.Cita
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles de la Cita";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <div class="card shadow-lg" style="width: 100%; max-width: 800px;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fa-solid fa-calendar-check me-2"></i>Detalles de la Cita
+                </h3>
+                <span class="badge bg-light text-primary fs-6">Folio: #@Model.FolioCitas</span>
+            </div>
 
-<div>
-    <h4>Cita</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.fechaCreacionCita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.fechaCreacionCita)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.fechaCita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.fechaCita)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.horaCita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.horaCita)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.horaInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.horaInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.horaTermino)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.horaTermino)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.estatusAtencion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.estatusAtencion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdDoctorNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdDoctorNavigation.IdDoctor)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdPacienteNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdPacienteNavigation.IdPaciente)
-        </dd>
-    </dl>
+            <div class="card-body bg-light">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="fa-solid fa-user-injured me-2"></i>Paciente
+                        </h5>
+                        <dl class="row mt-3">
+                            <dt class="col-sm-4 text-muted">Nombre:</dt>
+                            <dd class="col-sm-8 fw-bold">
+                                @Html.DisplayFor(model => model.IdPacienteNavigation.Nombre)
+                                @Html.DisplayFor(model => model.IdPacienteNavigation.ApellidoP)
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Edad:</dt>
+                            <dd class="col-sm-8 fw-bold">
+                                @Html.DisplayFor(model => model.IdPacienteNavigation.Edad)
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Sexo:</dt>
+                            <dd class="col-sm-8 fw-bold">
+                                @Html.DisplayFor(model => model.IdPacienteNavigation.Sexo)
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Estatus:</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.estatusAtencion?.ToLower() == "pendiente" || Model.estatusAtencion?.ToLower() == "programada")
+                                {
+                                    <span class="badge bg-warning text-dark">@Html.DisplayFor(model => model.estatusAtencion)</span>
+                                }
+                                else if (Model.estatusAtencion?.ToLower() == "completada" || Model.estatusAtencion?.ToLower() == "atendida")
+                                {
+                                    <span class="badge bg-success">@Html.DisplayFor(model => model.estatusAtencion)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Html.DisplayFor(model => model.estatusAtencion)</span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="fa-solid fa-clock me-2"></i>Horario
+                        </h5>
+                        <dl class="row mt-3">
+                            <dt class="col-sm-4 text-muted">@Html.DisplayNameFor(model => model.fechaCita):</dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => model.fechaCita)
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Inicio:</dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => model.horaInicio)
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Término:</dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => model.horaTermino)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-center gap-2 py-3">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Regresar
+                </a>
+                <a asp-controller="Recetums" asp-action="Create" asp-route-id="@Model?.FolioCitas" onclick="validar(event, '@Model?.FolioCitas')" class="btn btn-outline-success ">
+                    <i class="fa-solid fa-pen-to-square me-1"></i>Generar Receta
+                </a>
+
+                <a  class="btn btn-outline-danger">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Cancelar Cita
+                </a>
+
+                <a class="btn btn-outline-info" onclick="intentarAccion(event)">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Marcar como Atendida
+                </a>
+
+
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.FolioCitas">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                title: '¡Bienvenido!',
+                text: 'Recuerda que la unica accion que puedes hacer si la cita no es hoy es cancelarla',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    </script>
+
+    <script>
+        function intentarAccion(event) {
+        var noFecha = '@(Model?.fechaCita.Date != DateTime.Today ? "true" : "false")';
+
+             if (noFecha==="true") {
+                event.preventDefault(); // Evita que el botón haga su función original
+
+                Swal.fire({
+                    title: 'Acción bloqueada',
+                    text: 'No puedes realizar esta accion hasta la fecha de la cita',
+                    icon: 'error'
+                });
+            }
+        }
+
+
+
+        function validar(event,id) {
+                var esHoy = '@(Model?.fechaCita.Date == DateTime.Today ? "true" : "false")';
+
+        if (esHoy === "false") {
+            event.preventDefault();
+            Swal.fire('Error', 'No puedes realizar esta accion hasta la fecha de la cita', 'Accion Bloqueada');
+            return; // Detener todo
+        }
+
+
+            
+
+            /*var recetaExistente = '@(Model?.Receta.Any(x => x.FolioCitaNavigation?.FolioCitas == Model?.FolioCitas) != null ? "true" : "false")*/
+            var recetaExistente = '@(Model?.Receta?.Any() == true ? "true" : "false")';
+
+            if (recetaExistente === "true") {
+                event.preventDefault(); // Evita la navegación
+
+            Swal.fire({
+                title: 'Ya existe una receta para esta cita',
+                text: "¿ Deseas imprimirla ?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, imprimir'
+            }).then(
+                (result) => {
+                if (result.isConfirmed) {
+                   
+                    window.location.href = `/Recetums/generarPdf?id=${id}`;
+                }
+                });
+        }
+        
+
+        }
+
+
+
+
+       
+
+
+    </script>
+}

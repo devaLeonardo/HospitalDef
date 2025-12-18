@@ -119,14 +119,8 @@
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
 
-                                        <a asp-controller="Recetums" asp-action="Create" asp-route-id="@item.FolioCitas" class="btn btn-success btn-sm shadow-sm btn-atender-cita">
-                                            <i class="fas fa-user-check me-1"></i> Atender
-                                        </a>
-
-                                        <a asp-action="Delete" asp-route-id="@item.FolioCitas"
-                                           class="btn btn-danger btn-sm shadow-sm btn-cancelar-cita"
-                                           title="Cancelar Cita">
-                                            <i class="fas fa-trash-alt me-1"></i> Cancelar
+                                        <a asp-controller="Citas" asp-action="Details" asp-route-id="@item.FolioCitas" class="btn btn-outline-dark btn-sm shadow-sm btn-atender-cita">
+                                            <i class="fas fa-user-check me-1"></i> • • •
                                         </a>
 
                                     </div>
@@ -251,6 +245,8 @@
 
         });
     </script>
+
+
 
 
 

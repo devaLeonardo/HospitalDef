@@ -57,12 +57,18 @@ namespace HospitalDef.Controllers
         // GET: Recetums/Create
         public IActionResult Create(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cita =_context.Citas
+            
+
+
+
+
+                var cita =_context.Citas
                 .FirstOrDefault(c => c.FolioCitas == id);
 
             ViewBag.FolioCita = cita?.FolioCitas;
@@ -81,40 +87,56 @@ namespace HospitalDef.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FolioReceta,FolioCita,Observaciones,Tratamientos,Diagnostico")] Recetum recetum)
         {
+
+
+            
             if (ModelState.IsValid)
             {
-                //_context.Add(recetum);
-                //await _context.SaveChangesAsync();
-                
-                return await generarPDF(recetum); ;
-            }
+               _context.Add(recetum);
+               await _context.SaveChangesAsync();
 
-
+            return RedirectToAction("Index","Citas");
+        }
 
            
 
             return View(recetum);
         }
-
         
 
-        public async Task<IActionResult> generarPDF(Recetum recetum)
+
+
+
+        public async Task<IActionResult> generarPDF(int id)
         {
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjGyl/Vkd+XU9FcVRDQmJKYVF2R2VJelRyfF9FZ0wxOX1dQl9mSHxSckRkW3ZeeHRWQWFXUkU=");
 
-            // Cargar la navegación FolioCitaNavigation
-            await _context.Entry(recetum)
-            .Reference(r => r.FolioCitaNavigation)
-            .LoadAsync();
 
-            // Cargar la navegación IdPacienteNavigation a través de FolioCitaNavigation
-
-            await _context.Entry(recetum.FolioCitaNavigation)
-                .Reference(c => c.IdPacienteNavigation)
-                .LoadAsync();
+            
 
 
-        PdfDocument pdfDocument = new PdfDocument();
+            var recetum = await _context.Receta
+                .Include(r => r.FolioCitaNavigation)
+                .ThenInclude(c => c.IdPacienteNavigation)
+                .FirstOrDefaultAsync(m => m.FolioCitaNavigation.FolioCitas == id);
+
+            var fecha = recetum?.FolioCitaNavigation?.fechaCita.ToString("dd/MM/yyyy");
+
+            DateTime? fechaCita = recetum?.FolioCitaNavigation?.fechaCita;
+            DateTime hoy = DateTime.Today;
+
+            if (fechaCita.HasValue)
+            {
+                if (fechaCita.Value.Date != hoy)
+                {
+                    return BadRequest("No se puede generar la receta. La fecha de la cita no es hoy.");
+                }
+            }
+
+
+
+
+                PdfDocument pdfDocument = new PdfDocument();
             PdfPage currentPage = pdfDocument.Pages.Add();
             SizeF clientSize = currentPage.GetClientSize();
 
@@ -159,7 +181,6 @@ namespace HospitalDef.Controllers
 
             //aqui se agrega la fecha
 
-            var fecha = recetum.FolioCitaNavigation.fechaCita.ToString("dd/MM/yyyy");
 
             PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
             var text = new PdfTextElement(fecha, font);
@@ -238,6 +259,11 @@ namespace HospitalDef.Controllers
             result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
 
 
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 8);
+            text = new PdfTextElement("Este documento no es valido sin firma y sello del doctor", font);
+            result = text.Draw(currentPage, new PointF(14+300, result.Bounds.Bottom));
+
+
             //linea divisora
             PdfGraphics graphics2 = currentPage.Graphics;
             PdfPen bluePen = new PdfPen(Color.FromArgb(53, 67, 168), 2f);
@@ -249,66 +275,46 @@ namespace HospitalDef.Controllers
 
 
             //contenido de la receta
-            List<string> medicamentos = new List<string>()
-            {
-                "Paracetamol 500mg",
-                "Ibuprofeno 400mg ",
-                "Amoxicilina 500mg",
-                "Loratadina 10mg"
-            };
-
-
             font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
             text = new PdfTextElement("Medicamentos", font);
             result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 20));
 
-
-            foreach (var medicamento in medicamentos)
+            foreach (var line in recetum.Tratamientos.Split('\n'))
             {
                 font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
-                text = new PdfTextElement("• " + medicamento, font);
-                result = text.Draw(currentPage, new PointF(24, result.Bounds.Bottom + 10));
+                text = new PdfTextElement("- "+line, font);
+                result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
             }
+
+           
 
             //linea divisora
             graphics2.DrawLine(bluePen, new PointF(14, result.Bounds.Bottom + 15), new PointF(clientSize.Width - 14, result.Bounds.Bottom + 15));
 
-            List<string> tratamientos = new List<string>()
-            {
-                "1 tableta paracetamol cada 8 horas por 3 dias",
-                "2 tableta  cada 8 horas por 5 dias",
-                "1/2 tableta amoxilinia cada 8 horas por 3 dias",
-                "cada que se presenten muy fuerte los sintomas"
-            };
-
-
             font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
-            text = new PdfTextElement("Tratamientos", font);
+            text = new PdfTextElement("Tratamiento", font);
             result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 20));
 
-
-            foreach (var tratamiento in tratamientos)
+            foreach (var line in recetum.Diagnostico.Split('\n'))
             {
                 font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
-                text = new PdfTextElement("• " + tratamiento, font);
-                result = text.Draw(currentPage, new PointF(24, result.Bounds.Bottom + 10));
+                text = new PdfTextElement("- " + line, font);
+                result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
             }
+
 
 
             //linea divisora para observaciones
             graphics2.DrawLine(bluePen, new PointF(14, result.Bounds.Bottom + 15), new PointF(clientSize.Width - 14, result.Bounds.Bottom + 15));
 
-            String observaciones = "Se recomienda descansar y mantenerse hidratado. En caso de fiebre alta, acudir al hospital.2222" +
-                "\n wqweqwewewqewwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww" +
-                "\nwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww" +
-                "\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww";
+           
 
             font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
             text = new PdfTextElement("Observaciones", font);
             result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 20));
 
 
-            foreach (var line in observaciones.Split('\n'))
+            foreach (var line in recetum.Observaciones.Split('\n'))
             {
                 font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
                 text = new PdfTextElement(line, font);
@@ -377,9 +383,9 @@ namespace HospitalDef.Controllers
             pdfDocument.Close(true);
             stream.Position = 0;
 
-            string nombreArchivo = "FacturaGenerada.pdf";
+            string nombreArchivo = "Receta.pdf";
 
-            return File(stream, "application/pdf");
+            return File(stream,"application/pdf",nombreArchivo);
         }
 
 

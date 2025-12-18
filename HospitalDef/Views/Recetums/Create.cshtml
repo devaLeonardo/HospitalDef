@@ -65,6 +65,15 @@
             const tratamientosTextarea = document.getElementById("tratamientos");
             const diagnosticoTextarea = document.getElementById("diagnostico");
 
+            if (tratamientosTextarea || diagnosticoTextarea) {
+
+            if (tratamientosTextarea.value.trim() === '') {
+                tratamientosTextarea.value = '• ';
+            }
+            if (diagnosticoTextarea.value.trim() === '') {
+                diagnosticoTextarea.value = '• ';
+            }
+            }
 
             tratamientosTextarea.addEventListener('keydown', function (e) {
                if(e.key === 'Enter'){

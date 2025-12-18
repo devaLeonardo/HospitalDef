@@ -139,6 +139,7 @@ namespace HospitalDef.Controllers
             var cita = await _context.Citas
                 .Include(c => c.IdDoctorNavigation)
                 .Include(c => c.IdPacienteNavigation)
+                .Include(c=>c.Receta)
                 .FirstOrDefaultAsync(m => m.FolioCitas == id);
             if (cita == null)
             {
