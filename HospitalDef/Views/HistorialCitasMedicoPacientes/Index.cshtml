@@ -1,41 +1,66 @@
 ﻿@model IEnumerable<HospitalDef.Models.HistorialCitasMedicoPaciente>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bitácora de Citas";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">📋 Bitácora de Citas</h4>
+        </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Fecha)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Hora)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fecha)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Hora)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdHcmp">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdHcmp">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdHcmp">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <div class="card-body">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Estatus</th>
+                        <th>Doctor</th>
+                        <th>Consultorio</th>
+                        <th>Paciente</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                @item.Fecha.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="text-center">
+                                @item.Hora
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">
+                                    @(item.Estatus ?? "Sin estatus")
+                                </span>
+                            </td>
+                            <td>
+                                @(item.Doctor ?? "—")
+                            </td>
+                            <td class="text-center">
+                                @(item.Consultorio ?? "—")
+                            </td>
+                            <td>
+                                @(item.Paciente ?? "—")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center">
+                    No hay registros en la bitácora.
+                </div>
+            }
+        </div>
+        <a asp-controller="Recepcionistums" asp-action="Index" class="btn btn-outline-secondary px-4 rounded-pill">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Módulo
+        </a>
+    </div>
+</div>

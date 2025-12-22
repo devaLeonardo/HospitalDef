@@ -1,0 +1,133 @@
+﻿@model IEnumerable<HospitalDef.Models.HistorialCitasMedicoPaciente>
+
+@{
+    ViewData["Title"] = "Gestión de Citas";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"> Gestión de Citas</h4>
+            <span class="badge bg-dark">Total: @Model.Count()</span>
+        </div>
+
+        <div class="card-body">
+
+            @Html.AntiForgeryToken()
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Estatus</th>
+                            <th>Doctor</th>
+                            <th>Consultorio</th>
+                            <th>Paciente</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            bool cancelable =
+                            item.Estatus != null &&
+                            !item.Estatus.Contains("Cancelada") &&
+                            !item.Estatus.Contains("Atendida");
+
+                            <tr id="fila-@item.IdCita">
+                                <td class="text-center">@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">@item.Hora</td>
+                                <td class="text-center">
+                                    <span class="badge
+                                        @(item.Estatus != null && item.Estatus.Contains("Atendida") ? "bg-success" :
+                                                                                item.Estatus != null && item.Estatus.Contains("Cancelada") ? "bg-danger" :
+                                                                                "bg-secondary")">
+                                    @(item.Estatus ?? "Sin estatus")
+                                </span>
+                            </td>
+                            <td>@(item.Doctor ?? "—")</td>
+                            <td class="text-center">@(item.Consultorio ?? "—")</td>
+                            <td>@(item.Paciente ?? "—")</td>
+
+                                <td class="text-center">
+                                @if (cancelable)
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                onclick="cancelarCita(@item.IdCita)">
+                                            ❌ Cancelar
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No disponible</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center mt-3">
+                    No hay citas registradas.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function cancelarCita(folio) {
+
+            Swal.fire({
+                title: '¿Cancelar cita?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No'
+            }).then((result) => {
+
+                if (!result.isConfirmed) return;
+
+                fetch('@Url.Action("CancelarCita", "Citas")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken':
+                            document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `folio=${folio}`
+                })
+                .then(r => r.json())
+                .then(data => {
+
+                    if (data.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cancelada',
+                            text: data.mensaje,
+                            timer: 1800,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', data.mensaje, 'error');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Error', 'Error de servidor', 'error');
+                });
+            });
+        }
+    </script>
+}

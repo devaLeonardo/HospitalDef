@@ -580,13 +580,19 @@ namespace HospitalDef.Controllers
         }
 
 
-
+        [HttpGet]
+        public async Task<IActionResult> Cancelar()
+        {
+            var citas = await _context.HistorialCitasMedicoPacientes.ToListAsync();
+            return View(citas);
+        }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelarCita(int folio)
         {
+
             try
             {
                 var cita = await _context.Citas.FirstOrDefaultAsync(c => c.FolioCitas == folio);
@@ -618,7 +624,7 @@ namespace HospitalDef.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Json(new { ok = true, mensaje = "La cita ha sido Atendida con éxito." });
+                return Json(new { ok = true, mensaje = "La cita ha sido cancelada con éxito." });
             }
             catch (Exception ex)
             {

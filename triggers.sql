@@ -13,20 +13,37 @@ BEGIN
             idCita,
             fecha,
             hora,
-            estatus
+            estatus,
+            doctor,
+            consultorio,
+            paciente
         )
         SELECT
             i.FolioCitas,
             GETDATE(),
             CONVERT(time, GETDATE()),
-            i.estatusAtencion
+            i.estatusAtencion,
+
+            -- Doctor
+            CONCAT(e.nombre, ' ', e.apellidoP, ' ', ISNULL(e.apellidoM, '')),
+
+            -- Consultorio
+            CAST(doc.idConsultorio AS varchar(100)),
+
+            -- Paciente
+            CONCAT(p.nombre, ' ', p.apellidoP, ' ', ISNULL(p.apellidoM, ''))
+
         FROM INSERTED i
-        INNER JOIN DELETED d
-            ON i.FolioCitas = d.FolioCitas
-        WHERE d.estatusAtencion <> i.estatusAtencion;
+        INNER JOIN Doctor doc
+            ON i.idDoctor = doc.idDoctor
+        INNER JOIN Empleado e
+            ON doc.idEmpleado = e.idEmpleado
+        INNER JOIN Paciente p
+            ON i.idPaciente = p.idPaciente;
     END
 END;
 GO
+
 
 --TRIGGER CANCELACION DE CITAS
 CREATE TRIGGER trCitaCanceladaActualizarEstatus

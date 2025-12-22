@@ -152,5 +152,7 @@ namespace HospitalDef.Controllers
         {
             return _context.HistorialCitasMedicoPacientes.Any(e => e.IdHcmp == id);
         }
+
+
     }
 }
