@@ -54,6 +54,7 @@ public partial class HospitalContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
     public virtual DbSet<VistaDoctorHorario> VistaDoctorHorario { get; set; }
     public virtual DbSet<VistaDoctor> VistaDoctores { get; set; }
+    public virtual DbSet<RecetasAtendidas> RecetasAtendidas { get; set; }
 
 
 
@@ -63,6 +64,7 @@ public partial class HospitalContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+       
         modelBuilder.Entity<BitacoraCita>(entity =>
         {
             entity.HasKey(e => e.IdBitacoraCitas).HasName("PK__Bitacora__6F8088F7D3791E11");
@@ -579,6 +581,11 @@ public partial class HospitalContext : DbContext
             entity.HasNoKey();
             entity.ToView("VistaDoctores");
         });
+        modelBuilder.Entity<RecetasAtendidas>()
+           .HasNoKey()
+           .ToView("RecetasAtendidas");
+
+        base.OnModelCreating(modelBuilder);
 
     }
 

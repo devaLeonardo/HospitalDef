@@ -87,8 +87,6 @@ INNER JOIN Especialidades es ON d.idEspecialidad=es.idEspecialidad
 SELECT * FROM DoctorEspecialidad
 
 
---aun no creo la vista de estas dos 
-
 CREATE VIEW RecetasAtendidas AS
 SELECT
     d.idDoctor,
@@ -101,7 +99,7 @@ SELECT
     p.idPaciente,
     up.nombreUsuario AS UsuarioPaciente,
     p.nombre + ' ' + p.apellidoP + ' ' + p.apellidoM AS NombreCompletoPaciente,
-	c.fechaCita as feccha
+	c.fechaCita as Fecha
 FROM Citas c
 INNER JOIN Doctor d ON c.idDoctor = d.idDoctor
 INNER JOIN Empleado e ON d.idEmpleado = e.idEmpleado
@@ -110,27 +108,4 @@ INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
 INNER JOIN Usuario up ON p.idUsuario = up.idUsuario
 INNER JOIN Receta r ON c.folioCitas = r.folioCita;
 
-
-
-
-CREATE VIEW RecetasAtendidas AS
-SELECT
-    d.idDoctor,
-    ud.nombreUsuario AS UsuarioDoctor,
-    e.nombre + ' ' + e.apellidoP + ' ' + e.apellidoM AS NombreCompletoDoctor,
-    r.folioReceta AS numReceta,
-    r.observaciones,
-    r.tratamientos AS tratamiento,
-    r.diagnostico,
-    p.idPaciente,
-    up.nombreUsuario AS UsuarioPaciente,
-    p.nombre + ' ' + p.apellidoP + ' ' + p.apellidoM AS NombreCompletoPaciente,
-	c.fechaCita as feccha
-FROM Citas c
-INNER JOIN Doctor d ON c.idDoctor = d.idDoctor
-INNER JOIN Empleado e ON d.idEmpleado = e.idEmpleado
-INNER JOIN Usuario ud ON e.idUsuario = ud.idUsuario
-INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
-INNER JOIN Usuario up ON p.idUsuario = up.idUsuario
-LEFT JOIN Receta r ON c.folioCitas = r.folioCita;
 

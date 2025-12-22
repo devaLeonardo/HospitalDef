@@ -1,0 +1,84 @@
+﻿@model IEnumerable<HospitalDef.Models.RecetasAtendidas>
+
+@{
+    ViewData["Title"] = "Recetas Atendidas";
+}
+
+<div class="container mt-4">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-success">
+            <i class="fas fa-file-medical me-2"></i> Recetas Atendidas
+        </h2>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="input-group mb-4 shadow-sm">
+        <span class="input-group-text bg-success text-white">
+            <i class="fas fa-search"></i>
+        </span>
+        <input type="text"
+               id="buscarDoctor"
+               class="form-control"
+               placeholder="Buscar por nombre del doctor..." />
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-responsive shadow rounded">
+        <table class="table table-hover align-middle mb-0" id="tablaRecetas">
+            <thead class="table-success">
+                <tr class="text-center">
+                    <th>Doctor</th>
+                    <th>Paciente</th>
+                    <th>Receta</th>
+                    <th>Diagnóstico</th>
+                    <th>Tratamiento</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="doctor fw-semibold text-success">
+                            <i class="fas fa-user-md me-1"></i>
+                            @item.NombreCompletoDoctor
+                        </td>
+                        <td>
+                            <i class="fas fa-user me-1 text-secondary"></i>
+                            @item.NombreCompletoPaciente
+                        </td>
+                        <td class="text-center fw-bold">
+                            @item.NumReceta
+                        </td>
+                        <td style="max-width: 250px;">
+                            @item.Diagnostico
+                        </td>
+                        <td style="max-width: 250px;">
+                            @item.Tratamiento
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary">
+                                @item.Fecha.ToShortDateString()
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById("buscarDoctor").addEventListener("keyup", function () {
+        const filtro = this.value.toLowerCase();
+        const filas = document.querySelectorAll("#tablaRecetas tbody tr");
+
+        filas.forEach(fila => {
+            const doctor = fila.querySelector(".doctor").textContent.toLowerCase();
+            fila.style.display = doctor.includes(filtro) ? "" : "none";
+        });
+    });
+</script>

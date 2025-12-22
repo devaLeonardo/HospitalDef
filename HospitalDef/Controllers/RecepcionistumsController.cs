@@ -23,7 +23,7 @@ namespace HospitalDef.Controllers
         {
             var recepcionista = await _context.Recepcionista
                 .Include(r => r.IdEmpleadoNavigation)
-                    .ThenInclude(e => e.IdHorarioNavigation)
+                .ThenInclude(e => e.IdHorarioNavigation)
                 .FirstOrDefaultAsync();
 
             return View(recepcionista);

@@ -21,8 +21,15 @@ namespace HospitalDef.Controllers
         // GET: Farmaceuticoes
         public async Task<IActionResult> Index()
         {
-            var hospitalContext = _context.Farmaceutico.Include(f => f.IdEmpleadoNavigation);
-            return View(await hospitalContext.ToListAsync());
+            var farmaceutico = await _context.Farmaceutico
+                .Include(f => f.IdEmpleadoNavigation)
+                .ThenInclude(e => e.IdHorarioNavigation)
+                .FirstOrDefaultAsync();
+
+            if (farmaceutico == null)
+                return NotFound();
+
+            return View(farmaceutico);
         }
 
         // GET: Farmaceuticoes/Details/5
