@@ -4,50 +4,78 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
 
-<h4>Servicio</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Idservicio" />
-            <div class="form-group">
-                <label asp-for="NombreServicio" class="control-label"></label>
-                <input asp-for="NombreServicio" class="form-control" />
-                <span asp-validation-for="NombreServicio" class="text-danger"></span>
+    <!-- ===== Encabezado ===== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex align-items-center">
+            <i class="bi bi-pencil-square fs-2 text-primary me-3"></i>
+            <div>
+                <h3 class="mb-0 fw-bold">Editar Servicio</h3>
+                <small class="text-muted">Actualiza la información del servicio médico</small>
             </div>
-            <div class="form-group">
-                <label asp-for="Precio" class="control-label"></label>
-                <input asp-for="Precio" class="form-control" />
-                <span asp-validation-for="Precio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoraI" class="control-label"></label>
-                <input asp-for="HoraI" class="form-control" />
-                <span asp-validation-for="HoraI" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoraF" class="control-label"></label>
-                <input asp-for="HoraF" class="form-control" />
-                <span asp-validation-for="HoraF" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estatus" class="control-label"></label>
-                <input asp-for="Estatus" class="form-control" />
-                <span asp-validation-for="Estatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
+
+    <!-- ===== Formulario ===== -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Idservicio" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label asp-for="NombreServicio" class="form-label fw-semibold"></label>
+                    <input asp-for="NombreServicio" class="form-control" />
+                    <span asp-validation-for="NombreServicio" class="text-danger"></span>
+                </div>
+
+                <!-- Precio -->
+                <div class="mb-3">
+                    <label asp-for="Precio" class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="Precio" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Precio" class="text-danger"></span>
+                </div>
+
+                <!-- Horario -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="HoraI" class="form-label fw-semibold"></label>
+                        <input asp-for="HoraI" type="time" class="form-control" />
+                        <span asp-validation-for="HoraI" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="HoraF" class="form-label fw-semibold"></label>
+                        <input asp-for="HoraF" type="time" class="form-control" />
+                        <span asp-validation-for="HoraF" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save"></i> Guardar cambios
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

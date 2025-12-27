@@ -53,67 +53,66 @@ namespace HospitalDef.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Idservicio,NombreServicio,Precio,HoraI,HoraF,Estatus")] Servicio servicio)
+        public async Task<IActionResult> Create(Servicio servicio)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(servicio);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(servicio);
+            servicio.Estatus = "disponible";
+
+            if (!ModelState.IsValid)
+                return View(servicio);
+
+            _context.Servicios.Add(servicio);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
+
+        // GET: Servicios/Edit/5
         // GET: Servicios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var servicio = await _context.Servicios.FindAsync(id);
             if (servicio == null)
-            {
                 return NotFound();
-            }
+
             return View(servicio);
         }
+
 
         // POST: Servicios/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Idservicio,NombreServicio,Precio,HoraI,HoraF,Estatus")] Servicio servicio)
+        public async Task<IActionResult> Edit(Servicio servicio)
         {
-            if (id != servicio.Idservicio)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid)
+                return View(servicio);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(servicio);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ServicioExists(servicio.Idservicio))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(servicio);
+            var servicioDB = await _context.Servicios.FindAsync(servicio.Idservicio);
+            if (servicioDB == null)
+                return NotFound();
+
+            servicioDB.NombreServicio = servicio.NombreServicio;
+            servicioDB.Precio = servicio.Precio;
+            servicioDB.HoraI = servicio.HoraI;
+            servicioDB.HoraF = servicio.HoraF;
+            servicioDB.Estatus = servicio.Estatus;
+
+            await _context.SaveChangesAsync();
+
+            
+            TempData["ServicioEditado"] = true;
+
+            return RedirectToAction(nameof(Index));
         }
+
+
+
+
 
         // GET: Servicios/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -152,5 +151,30 @@ namespace HospitalDef.Controllers
         {
             return _context.Servicios.Any(e => e.Idservicio == id);
         }
+        [HttpPost]
+        public async Task<IActionResult> Desactivar(int id)
+        {
+            var servicio = await _context.Servicios.FindAsync(id);
+            if (servicio == null)
+                return NotFound();
+
+            servicio.Estatus = "Inactivo"; // o 0 si es int
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Activar(int id)
+        {
+            var servicio = await _context.Servicios.FindAsync(id);
+            if (servicio == null) return NotFound();
+
+            servicio.Estatus = "disponible";
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
     }
 }

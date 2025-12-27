@@ -16,14 +16,13 @@
                     <i class="bi bi-capsule-pill text-primary"></i>
                     Inventario de Medicamentos
                 </h3>
-                <small class="text-muted">Gestión de existencias, ventas y control</small>
+                <small class="text-muted">Gestión de existencias y control</small>
             </div>
 
-            <button class="btn btn-primary rounded-pill"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalAgregar">
-                <i class="bi bi-plus-circle"></i> Nuevo medicamento
-            </button>
+            <a asp-controller="Medicamentoes" asp-action="Create" class="btn btn-primary rounded-pill">
+                <i class="bi bi-plus-circle"></i> Agregar medicamento
+            </a>
+
         </div>
     </div>
 
@@ -82,7 +81,7 @@
                                 </div>
                             </td>
                         </tr>
-                                        }
+                        }
                 </tbody>
 
             </table>
@@ -101,7 +100,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow">
 
-            <form asp-action="Edit" method="post">
+            <form asp-controller="Medicamentoes" asp-action="Edit" method="post">
                 <input type="hidden" name="IdMedicamento" id="editId" />
 
                 <div class="modal-header bg-primary text-white">

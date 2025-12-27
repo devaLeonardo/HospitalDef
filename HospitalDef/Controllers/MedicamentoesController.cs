@@ -85,35 +85,17 @@ namespace HospitalDef.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdMedicamento,NombreMedicamento,Lote,Caducidad,PrecioCompra,PrecioVenta,Ubicacion,Stock")] Medicamento medicamento)
+        public async Task<IActionResult> Edit(Medicamento medicamento)
         {
-            if (id != medicamento.IdMedicamento)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(medicamento);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MedicamentoExists(medicamento.IdMedicamento))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+            if (!ModelState.IsValid)
                 return RedirectToAction(nameof(Index));
-            }
-            return View(medicamento);
+
+            _context.Update(medicamento);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Medicamentoes/Delete/5
         public async Task<IActionResult> Delete(int? id)

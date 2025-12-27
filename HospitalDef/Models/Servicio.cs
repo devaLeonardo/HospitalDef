@@ -11,9 +11,9 @@ public partial class Servicio
 
     public decimal Precio { get; set; }
 
-    public TimeOnly HoraI { get; set; }
+    public TimeSpan HoraI { get; set; }
 
-    public TimeOnly HoraF { get; set; }
+    public TimeSpan HoraF { get; set; }
 
     public string Estatus { get; set; } = null!;
 
