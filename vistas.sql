@@ -109,3 +109,39 @@ INNER JOIN Usuario up ON p.idUsuario = up.idUsuario
 INNER JOIN Receta r ON c.folioCitas = r.folioCita;
 
 
+
+
+
+
+--vista para historial del paciente
+CREATE VIEW HistorialMedicoPacienteParaDoctor
+AS
+SELECT
+    r.folioReceta AS IdBitacoraCitas,
+    c.fechaCita AS FechaMovimiento,
+    -- Doctor
+    d.idDoctor,
+    ud.nombreUsuario AS UsuarioDoctor,
+    e.nombre + ' ' + e.apellidoP + ' ' + e.apellidoM AS NombreDoctor,
+    -- Especialidad
+    es.especialidades AS Especialidad,
+    -- Paciente
+    p.idPaciente,
+    up.nombreUsuario AS UsuarioPaciente,
+    p.nombre + ' ' + p.apellidoP + ' ' + p.apellidoM AS NombrePaciente,
+    -- Receta
+    r.observaciones,
+    r.tratamientos,
+    r.diagnostico,
+    -- Consultorio
+    CONCAT(co.numero, ' - ', co.planta, ' - ', co.edificio) AS Consultorio
+FROM Citas c
+INNER JOIN Doctor d ON c.idDoctor = d.idDoctor
+INNER JOIN Especialidades es ON d.idEspecialidad = es.idEspecialidad
+INNER JOIN Consultorio co ON d.idConsultorio = co.idConsultorio
+INNER JOIN Empleado e ON d.idEmpleado = e.idEmpleado
+INNER JOIN Usuario ud ON e.idUsuario = ud.idUsuario
+INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
+INNER JOIN Usuario up ON p.idUsuario = up.idUsuario
+INNER JOIN Receta r ON c.folioCitas = r.folioCita;
+

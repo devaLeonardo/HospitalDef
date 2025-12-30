@@ -1,53 +1,64 @@
 ﻿@model HospitalDef.Models.Servicio
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nuevo Servicio";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-<h4>Servicio</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NombreServicio" class="control-label"></label>
-                <input asp-for="NombreServicio" class="form-control" />
-                <span asp-validation-for="NombreServicio" class="text-danger"></span>
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Registrar Servicio
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Estatus" value="disponible" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreServicio" class="form-label fw-semibold"></label>
+                            <input asp-for="NombreServicio" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Precio" class="form-label fw-semibold"></label>
+                            <input asp-for="Precio" class="form-control" type="number" step="0.01" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoraI" class="form-label fw-semibold"></label>
+                                <input asp-for="HoraI" type="time" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoraF" class="form-label fw-semibold"></label>
+                                <input asp-for="HoraF" type="time" class="form-control" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Guardar Servicio
+                        </button>
+                    </form>
+
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Precio" class="control-label"></label>
-                <input asp-for="Precio" class="form-control" />
-                <span asp-validation-for="Precio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoraI" class="control-label"></label>
-                <input asp-for="HoraI" class="form-control" />
-                <span asp-validation-for="HoraI" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoraF" class="control-label"></label>
-                <input asp-for="HoraF" class="form-control" />
-                <span asp-validation-for="HoraF" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estatus" class="control-label"></label>
-                <input asp-for="Estatus" class="form-control" />
-                <span asp-validation-for="Estatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

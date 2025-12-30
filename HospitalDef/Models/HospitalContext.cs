@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HospitalDef.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace HospitalDef.Models;
 
@@ -55,6 +56,8 @@ public partial class HospitalContext : DbContext
     public virtual DbSet<VistaDoctorHorario> VistaDoctorHorario { get; set; }
     public virtual DbSet<VistaDoctor> VistaDoctores { get; set; }
     public virtual DbSet<RecetasAtendidas> RecetasAtendidas { get; set; }
+    public DbSet<HistorialMedicoPacienteVM> HistorialMedicoPacienteParaDoctor { get; set; }
+
 
 
 
@@ -584,6 +587,13 @@ public partial class HospitalContext : DbContext
         modelBuilder.Entity<RecetasAtendidas>()
            .HasNoKey()
            .ToView("RecetasAtendidas");
+
+        base.OnModelCreating(modelBuilder);
+
+
+        modelBuilder.Entity<HistorialMedicoPacienteVM>()
+           .HasNoKey()
+           .ToView("HistorialMedicoPacienteParaDoctor");
 
         base.OnModelCreating(modelBuilder);
 
