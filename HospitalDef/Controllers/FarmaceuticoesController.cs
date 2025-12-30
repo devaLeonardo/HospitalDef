@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -21,13 +22,25 @@ namespace HospitalDef.Controllers
         // GET: Farmaceuticoes
         public async Task<IActionResult> Index()
         {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return RedirectToAction("Login", "Acceso");
+
+            int idUsuario = int.Parse(userId);
+
+
             var farmaceutico = await _context.Farmaceutico
                 .Include(f => f.IdEmpleadoNavigation)
                 .ThenInclude(e => e.IdHorarioNavigation)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p => p.IdEmpleadoNavigation.IdUsuario == idUsuario);
 
             if (farmaceutico == null)
                 return NotFound();
+
+
+
 
             return View(farmaceutico);
         }

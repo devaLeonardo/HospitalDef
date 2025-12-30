@@ -10,41 +10,48 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <h2 class="menu-title">Menú</h2>
+        <div class="sidebar-header">
+            <h2 class="menu-title">Hospital<span>App</span></h2>
+        </div>
 
-        <a class="menu-btn" asp-controller="Usuarios" asp-action="CreateUsuario">
-            Crear Usuario
-        </a>
+        <div class="menu-section">
+            <p class="section-label">Gestión de Usuarios</p>
+            <a class="menu-btn" asp-controller="Usuarios" asp-action="CreateUsuario">
+                <i class="fas fa-user-plus"></i> Crear Usuario
+            </a>
+            <a class="menu-btn" asp-controller="vistaDoctores" asp-action="Index">
+                <i class="fas fa-user-md"></i> Doctores
+            </a>
+            <a class="menu-btn" asp-controller="Pacientes" asp-action="ListadoPacientes">
+                <i class="fas fa-user-injured"></i> Pacientes
+            </a>
+        </div>
 
-        <a class="menu-btn" asp-controller="vistaDoctores" asp-action="Index">
-            Visualizar Doctores
-        </a>
+        <div class="menu-section">
+            <p class="section-label">Consultas y Citas</p>
+            <a class="menu-btn active" asp-controller="Pacientes" asp-action="Index">
+                <i class="fas fa-calendar-plus"></i> Agendar Cita
+            </a>
+            <a class="menu-btn" asp-controller="Citas" asp-action="Cancelar">
+                <i class="fas fa-calendar-check"></i> Visualizar Citas
+            </a>
+            <a class="menu-btn" asp-controller="HistorialCitasMedicoPacientes" asp-action="Index">
+                <i class="fas fa-book-medical"></i> Bitácora
+            </a>
+        </div>
 
-       <!--<a class="menu-btn" asp-controller="Empleadoes" asp-action="Index">
-            Visualizar Empleados
-         </a>-->
-        <a class="menu-btn" asp-controller="Pacientes" asp-action="ListadoPacientes">
-            Visualizar Pacientes
-        </a>
-       
-        <a class="menu-btn" asp-controller="HistorialCitasMedicoPacientes" asp-action="Index">
-            Visualizar Bitacora
-        </a>
-        <a class="menu-btn" asp-controller="Citas" asp-action="Cancelar">
-            Visualizar Citas
-        </a>
+        <div class="menu-section">
+            <p class="section-label">Administración</p>
+            <a class="menu-btn" asp-controller="RecetasAtendidas" asp-action="Index">
+                <i class="fas fa-file-prescription"></i> Recetas Atendidas
+            </a>
+        </div>
 
-        <a class="menu-btn" asp-controller="Pacientes" asp-action="Index">
-            Agendar Cita
-        </a>
-
-        <a class="menu-btn" asp-controller="RecetasAtendidas" asp-action="Index">
-            Recetas atendidas
-        </a>
-
-        <a class="menu-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecep">
-            Datos personales
-        </a>
+        <div class="sidebar-footer">
+            <a class="menu-btn profile-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecep">
+                <i class="fas fa-id-card"></i> Mis Datos
+            </a>
+        </div>
     </div>
     <div class="container py-5">
         <div class="row justify-content-center">
