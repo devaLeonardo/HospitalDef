@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HospitalDef.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HospitalDef.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HospitalDef.Controllers
 {
@@ -21,9 +22,15 @@ namespace HospitalDef.Controllers
         // GET: Recepcionistums
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+                return NotFound("Ocurrio un error inesperado por favor regresa");
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
             var recepcionista = await _context.Recepcionista
                 .Include(r => r.IdEmpleadoNavigation)
                 .ThenInclude(e => e.IdHorarioNavigation)
+                .Where(r => r.IdEmpleadoNavigation.IdUsuario == userId)
                 .FirstOrDefaultAsync();
 
             return View(recepcionista);

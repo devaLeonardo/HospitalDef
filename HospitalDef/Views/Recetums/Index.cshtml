@@ -51,9 +51,9 @@
                             </div>
 
                             <h2 class="fw-bold text-dark mb-1">
-                                @Model.IdEmpleadoNavigation.Nombre
-                                @Model.IdEmpleadoNavigation.ApellidoP
-                                @Model.IdEmpleadoNavigation.ApellidoM
+                                @Model.IdEmpleadoNavigation?.Nombre
+                                @Model.IdEmpleadoNavigation?.ApellidoP
+                                @Model.IdEmpleadoNavigation?.ApellidoM
                             </h2>
 
                             <div class="mt-2">
@@ -74,7 +74,7 @@
                                         RFC
                                     </h6>
                                     <p class="fs-5 fw-bold mb-0 text-dark font-monospace">
-                                        @Model.IdEmpleadoNavigation.Rfc
+                                        @Model.IdEmpleadoNavigation?.Rfc
                                     </p>
                                 </div>
                             </div>
@@ -86,10 +86,10 @@
                                         Dirección
                                     </h6>
                                     <p class="mb-0 text-dark">
-                                        @Model.IdEmpleadoNavigation.Calle,
-                                        @Model.IdEmpleadoNavigation.Colonia,
-                                        @Model.IdEmpleadoNavigation.Municipio,
-                                        @Model.IdEmpleadoNavigation.Estado
+                                        @Model.IdEmpleadoNavigation?.Calle,
+                                        @Model.IdEmpleadoNavigation?.Colonia,
+                                        @Model.IdEmpleadoNavigation?.Municipio,
+                                        @Model.IdEmpleadoNavigation?.Estado
                                     </p>
                                 </div>
                             </div>
