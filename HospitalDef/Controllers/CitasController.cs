@@ -153,37 +153,76 @@ namespace HospitalDef.Controllers
         // GET: Citas/Create
         public IActionResult Create()
         {
+            if (!User.Identity.IsAuthenticated)
+                return NotFound();
+
+            // ID del usuario logueado
+            var userId = int.Parse(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var role = User?.FindFirst(ClaimTypes.Role)?.Value;
 
 
-            ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
-            // Id del usuario loggeado
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId == null)
+            if (userId == 0)
                 return RedirectToAction("Login", "Acceso");
 
-            // Buscar al paciente relacionado con este usuario
-            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == int.Parse(userId));
 
-            if (paciente == null)
-                return BadRequest("No se encontró el paciente del usuario logueado.");
-
-            // pasar el paciente fijo
-            ViewBag.PacienteNombre = paciente.Nombre;
-            ViewBag.PacienteId = paciente.IdPaciente;
-
-            var especialidades = _context.Especialidades;
-            ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
-
-            var cita = new Cita
+            if (role.Equals("Paciente"))
             {
-                fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
-            };
-            if (cita.idDoctor.HasValue)
-                CargarHorarioDoctor(cita.idDoctor.Value);
+
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == userId);
+
+                if (paciente == null)
+                    return BadRequest("No se encontró el paciente del usuario logueado.");
+
+                // pasar el paciente fijo
+                ViewBag.PacienteNombre = paciente.Nombre;
+                ViewBag.PacienteId = paciente.IdPaciente;
+
+                var especialidades = _context.Especialidades;
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
+
+                var cita = new Cita
+                {
+                    fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
+                };
+
+                if (cita.idDoctor.HasValue)
+                    CargarHorarioDoctor(cita.idDoctor.Value);
 
 
-            return View(cita);
+                return View("Create", cita);
+            }
+            else
+            {
+
+               
+
+                ViewData["IdDoctor"] = new SelectList(_context.Doctors, "IdDoctor", "IdDoctor");
+                
+                //ViewBag.Paciente = new SelectList(_context.Pacientes, "IdPaciente", "NombreCompleto");
+                ViewBag.Paciente = _context.Pacientes
+                                            .Include(d => d.IdUsuarioNavigation)
+                                            .Select(d => new SelectListItem
+                                            {
+                                                Value = d.IdPaciente.ToString(),
+                                                Text = ("["+ d.IdUsuarioNavigation.NombreUsuario +"] " + d.Nombre + " " + d.ApellidoP + " " + d.ApellidoM)
+                                            })
+                                            .ToList();
+                
+
+                var especialidades = _context.Especialidades;
+                ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "Especialidades");
+
+                var cita = new Cita
+                {
+                    fechaCita = DateTime.Now//le pasa la fecha y hora del dia de hoy al calendario
+                };
+
+                if (cita.idDoctor.HasValue)
+                    CargarHorarioDoctor(cita.idDoctor.Value);
+
+                return View("CreateRecepcion",cita);
+            }
         }
 
 
@@ -209,14 +248,30 @@ namespace HospitalDef.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cita cita)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == int.Parse(userId));
+            if (!User.Identity.IsAuthenticated)
+                return NotFound();
 
-            if (paciente == null)
-                return BadRequest("No se encontró el paciente del usuario logeado.");
+            // ID del usuario logueado
+            var userId = int.Parse(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var role = User?.FindFirst(ClaimTypes.Role)?.Value;
 
-            // Fijar SIEMPRE el paciente
-            cita.idPaciente = paciente.IdPaciente;
+
+            if (userId == 0)
+                return RedirectToAction("Login", "Acceso");
+
+
+            if (role.Equals("Paciente"))
+            {
+                var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.IdUsuario == userId);
+
+                if (paciente == null)
+                    return BadRequest("No se encontró el paciente del usuario logeado.");
+
+                // Fijar SIEMPRE el paciente
+                cita.idPaciente = paciente.IdPaciente;
+
+
+            }
 
             // Si la fecha viene sin valor (cuando falla validación)
             if (cita.fechaCita == default)
@@ -258,7 +313,13 @@ namespace HospitalDef.Controllers
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
                     CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
-                return View(cita);
+
+                //Cargar dependiendo de quien sea
+                if (role.Equals("Paciente"))
+                    return View("Create",cita);
+                else
+                    return View("CreateRecepcion", cita);
+
             }
 
             // Validar citas pendientes
@@ -281,7 +342,11 @@ namespace HospitalDef.Controllers
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
                     CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
-                return View(cita);
+                //Cargar dependiendo de quien sea
+                if (role.Equals("Paciente"))
+                    return View("Create", cita);
+                else
+                    return View("CreateRecepcion", cita);
             }
 
             // Validar horario del doctor
@@ -329,7 +394,11 @@ namespace HospitalDef.Controllers
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
                     CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
-                return View(cita);
+                //Cargar dependiendo de quien sea
+                if (role.Equals("Paciente"))
+                    return View("Create", cita);
+                else
+                    return View("CreateRecepcion", cita);
             }
 
             // Validar encimado de citas
@@ -353,17 +422,37 @@ namespace HospitalDef.Controllers
                 CargarCombos(cita);
                 if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
                     CargarHorarioDoctor(cita.idDoctor.Value);//no separace el horario
-                return View(cita);
+                //Cargar dependiendo de quien sea
+                if (role.Equals("Paciente"))
+                    return View("Create", cita);
+                else
+                    return View("CreateRecepcion", cita);
             }
 
             // Guardar en la base de datos los cambios
             _context.Add(cita);
             await _context.SaveChangesAsync();
 
-            string mensaje = "Recuerda que solo tienes 8 horas para pagar tu cita";
-            TempData["Alerta Pago"] = mensaje;
 
-            return RedirectToAction("Index", "Citas");
+
+            //Cargar dependiendo de quien sea
+            if (role.Equals("Paciente"))
+            {
+                string mensaje = "Recuerda que solo tienes 8 horas para pagar tu cita";
+                TempData["Alerta Pago"] = mensaje;
+
+                return RedirectToAction("Index", "Citas");
+            }
+            else
+            {
+                string mensaje = "Recuerdale al paciente que solo tiene 8 horas para pagar su cita";
+                TempData["Alerta Pago"] = mensaje;
+
+                return RedirectToAction("Index", "Recepcionistums");
+            }
+
+
+
         }
 
 
@@ -665,12 +754,31 @@ namespace HospitalDef.Controllers
                 cita.idDoctor
             );
 
-            // PACIENTE LOGGEADO
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == int.Parse(userId));
+            // Paciente logueado o pacientes segun sea el rol
 
-            ViewBag.PacienteNombre = paciente?.Nombre;
-            ViewBag.PacienteId = paciente?.IdPaciente;
+            // ID del usuario logueado
+            var userId = int.Parse(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var role = User?.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (!role.Equals("Paciente"))
+            {
+                ViewBag.Paciente = _context.Pacientes
+                                            .Include(d => d.IdUsuarioNavigation)
+                                            .Select(d => new SelectListItem
+                                            {
+                                                Value = d.IdPaciente.ToString(),
+                                                Text = ("[" + d.IdUsuarioNavigation.NombreUsuario + "] " + d.Nombre + " " + d.ApellidoP + " " + d.ApellidoM)
+                                            })
+                                            .ToList();
+            }
+            else
+            {
+                var paciente = _context.Pacientes.FirstOrDefault(p => p.IdUsuario == (userId));
+
+                ViewBag.PacienteNombre = paciente?.Nombre;
+                ViewBag.PacienteId = paciente?.IdPaciente;
+            }
+                
         }
         public IActionResult GetHorarioDoctor(int idDoctor)
         {

@@ -29,7 +29,7 @@
 
         <div class="menu-section">
             <p class="section-label">Consultas y Citas</p>
-            <a class="menu-btn active" asp-controller="Pacientes" asp-action="Index">
+            <a class="menu-btn active" asp-controller="Citas" asp-action="Create">
                 <i class="fas fa-calendar-plus"></i> Agendar Cita
             </a>
             <a class="menu-btn" asp-controller="Citas" asp-action="Cancelar">
@@ -142,3 +142,33 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["Alerta"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: 'Información',
+                text: '@TempData["Alerta"]',
+                icon: 'info',
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+    }
+    @if (TempData["Alerta Pago"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: 'Información',
+                text: '@TempData["Alerta Pago"]',
+                icon: 'info',
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+    }
+
+
+}

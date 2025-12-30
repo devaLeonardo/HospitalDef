@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HospitalDef.Models;
 
@@ -14,6 +15,8 @@ public partial class Paciente
     public string ApellidoP { get; set; } = null!;
 
     public string ApellidoM { get; set; } = null!;
+
+    
 
     public DateOnly FechaNacimiento { get; set; }
 
@@ -34,4 +37,8 @@ public partial class Paciente
     public virtual ICollection<HistorialMedicoPaciente> HistorialMedicoPacientes { get; set; } = new List<HistorialMedicoPaciente>();
 
     public virtual Usuario? IdUsuarioNavigation { get; set; }
+
+
+    [NotMapped]
+    public string NombreCompleto => $"{"["} {IdPaciente} {"]"} {Nombre} {ApellidoP} {ApellidoM}";
 }

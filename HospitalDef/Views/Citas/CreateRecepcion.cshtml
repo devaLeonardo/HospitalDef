@@ -1,178 +1,196 @@
 ﻿@model HospitalDef.Models.Cita
 
 @{
-    ViewData["Title"] = "Agendar cita - Recepción";
+    ViewData["Title"] = "Agendar";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+<div class="row justify-content-center my-5">
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Agendar cita para paciente</h4>
-                </div>
+    <div class="col-lg-6 col-md-8 agendar-form-container">
 
-                <div class="card-body">
-                    <form asp-action="CreateRecepcion" method="post">
-                        @Html.AntiForgeryToken()
+        <div class="form-header text-center mb-4">
+            <h1>Agenda una cita para el paciente</h1>
+            <h4>Cita</h4>
+            <hr />
+        </div>
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <!-- PACIENTE -->
-                        <div class="mb-3">
-                            <label asp-for="idPaciente" class="form-label fw-bold">Paciente</label>
-                            <select asp-for="idPaciente"
-                                    asp-items="ViewBag.Pacientes"
-                                    class="form-select">
-                                <option value="">Seleccione un paciente</option>
-                            </select>
-                            <span asp-validation-for="idPaciente" class="text-danger"></span>
-                        </div>
-
-                        <hr />
-
-                        <!-- ESPECIALIDAD -->
-                        <div class="mb-3">
-                            <label asp-for="EspecialidadIdFiltro" class="form-label fw-bold">Especialidad</label>
-                            <select asp-for="EspecialidadIdFiltro"
-                                    class="form-select"
-                                    id="EspecialidadSelect"
-                                    asp-items="ViewBag.Especialidades">
-                                <option value="">Seleccione especialidad</option>
-                            </select>
-                            <span asp-validation-for="EspecialidadIdFiltro" class="text-danger"></span>
-                        </div>
-
-                        <!-- DOCTOR -->
-                        <div class="mb-3">
-                            <label asp-for="idDoctor" class="form-label fw-bold">Doctor</label>
-                            <select asp-for="idDoctor"
-                                    class="form-select"
-                                    id="DoctorSelect">
-                                <option value="">Seleccione doctor</option>
-                            </select>
-                            <span asp-validation-for="idDoctor" class="text-danger"></span>
-                        </div>
-                        <div id="infoDoctor" class="mt-3"></div>
-                        <!-- FECHA -->
-                        <div class="mb-3">
-                            <label asp-for="fechaCita" class="form-label fw-bold">Fecha y hora</label>
-                            <input asp-for="fechaCita"
-                                   type="datetime-local"
-                                   class="form-control" />
-                            <span asp-validation-for="fechaCita" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-4">
-
-                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                                Volver a mi modulo
-                            </a>
-
-                            <button type="submit" class="btn btn-outline-primary btn-sm">
-                                Agendar
-                            </button>
-
-
-                        </div>
-
-                    </form>
-                </div>
+            <!-- PACIENTE -->
+            <div class="form-group mb-3">
+                <label asp-for="idPaciente" class="control-label">Paciente:</label>
+                <select asp-for="idPaciente" class="form-control" asp-items="@ViewBag.Paciente"></select>
             </div>
 
-        </div>
+            <!-- ESPECIALIDAD -->
+            <div class="form-group mb-3">
+                <label asp-for="EspecialidadIdFiltro" class="control-label">Especialidad:</label>
+
+                <select asp-for="EspecialidadIdFiltro"
+                        id="ddlEspecialidad"
+                        class="form-control"
+                        asp-items="@(ViewBag.Especialidades as SelectList)">
+                    <option value="">-- Selecciona una Especialidad --</option>
+                </select>
+
+                <span asp-validation-for="EspecialidadIdFiltro" class="text-danger"></span>
+            </div>
+
+            <!-- DOCTOR -->
+            <div class="form-group mb-3">
+                <label asp-for="idDoctor" class="control-label">Doctor:</label>
+
+                <select asp-for="idDoctor"
+                        id="ddlDoctor"
+                        class="form-control"
+                        asp-items="@(ViewBag.Doctores as SelectList)">
+                    <option value="">-- Selecciona un Doctor --</option>
+                </select>
+
+                <span asp-validation-for="idDoctor" class="text-danger"></span>
+            </div>
+
+            <!-- HORARIO POR AJAX -->
+            <div id="doctor-horario" class="mt-3" style="display:none;">
+                <!-- Se llenará dinámicamente -->
+            </div>
+
+            <!-- FECHA CITA -->
+            <div class="form-group mb-4">
+                <label asp-for="fechaCita" class="control-label">Fecha y Hora</label>
+
+                <input asp-for="fechaCita"
+                       type="datetime-local"
+                       class="form-control"
+                       value="@Model.fechaCita.ToString("yyyy-MM-ddTHH:mm")" />
+
+                <span asp-validation-for="fechaCita" class="text-danger"></span>
+            </div>
+
+            <!-- BOTONES -->
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-controller="Recepcionistums" asp-action="Index" class="btn btn-outline-secondary">Regresar a mi modulo</a>
+                <input type="submit" value="Agendar Cita" class="btn btn-outline-primary btn-sm" />
+            </div>
+
+        </form>
+
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            const especialidadSelect = document.getElementById("EspecialidadSelect");
-            const doctorSelect = document.getElementById("DoctorSelect");
-            const infoDoctor = document.getElementById("infoDoctor");
+        // ===========================
+        // CARGAR DOCTORES POR AJAX
+        // ===========================
+        $(document).ready(function () {
 
-            // 1️⃣ CUANDO CAMBIA ESPECIALIDAD → CARGAR DOCTORES
-            especialidadSelect.addEventListener("change", function () {
+            let especialidadSeleccionada = $("#ddlEspecialidad").val();
+            let doctorSeleccionado = "@Model.idDoctor";
 
-                const especialidadId = this.value;
+            if (especialidadSeleccionada) {
+                cargarDoctores(especialidadSeleccionada, doctorSeleccionado);
+            }
 
-                doctorSelect.innerHTML = '<option value="">Seleccione doctor</option>';
-                infoDoctor.innerHTML = "";
-
-                if (!especialidadId) return;
-
-                fetch(`/Citas/GetDoctoresPorEspecialidad?IdEspecialidad=${especialidadId}`)
-                    .then(r => r.json())
-                    .then(data => {
-
-                        console.log("Doctores:", data);
-
-                        data.forEach(d => {
-                            const opt = document.createElement("option");
-                            opt.value = d.id;
-                            opt.textContent = d.nombre;
-                            doctorSelect.appendChild(opt);
-                        });
-                    })
-                    .catch(err => console.error(err));
+            $("#ddlEspecialidad").change(function () {
+                let espId = $(this).val();
+                $("#ddlDoctor").empty().append('<option value="">Cargando...</option>');
+                cargarDoctores(espId);
             });
 
-            // 2️⃣ CUANDO CAMBIA DOCTOR → MOSTRAR HORARIO + CONSULTORIO
-            doctorSelect.addEventListener("change", function () {
+            function cargarDoctores(especialidadId, doctorActual = null) {
+                $.ajax({
+                    url: '/Citas/GetDoctoresPorEspecialidad',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { IdEspecialidad: especialidadId },
+                    success: function (data) {
 
-                const doctorId = this.value;
-                infoDoctor.innerHTML = "";
+                        $("#ddlDoctor").empty().append('<option value="">-- Selecciona un Doctor --</option>');
 
-                if (!doctorId) return;
+                        $.each(data, function (i, doctor) {
+                            $("#ddlDoctor").append($('<option/>', {
+                                value: doctor.value,
+                                text: doctor.text
+                            }));
+                        });
 
-                fetch(`/Citas/GetHorarioDoctor?idDoctor=${doctorId}`)
-                    .then(r => r.json())
-                    .then(data => {
-
-                        if (data.length === 0) {
-                            infoDoctor.innerHTML =
-                                "<p class='text-danger'>No hay horario registrado.</p>";
-                            return;
+                        if (doctorActual) {
+                            $("#ddlDoctor").val(doctorActual);
+                            cargarHorarioDoctor(doctorActual);
                         }
-
-                        let html = `
-                            <h5>Horario del doctor</h5>
-                            <table class="table table-bordered mt-2">
-                                <thead>
-                                    <tr>
-                                        <th>Día</th>
-                                        <th>Inicio</th>
-                                        <th>Fin</th>
-                                        <th>Consultorio</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-
-                        data.forEach(h => {
-                            html += `
-                                <tr>
-                                    <td>${h.dia}</td>
-                                    <td>${h.inicio}</td>
-                                    <td>${h.fin}</td>
-                                    <td>${h.consultorio}</td>
-                                </tr>`;
-                        });
-
-                        html += "</tbody></table>";
-                        infoDoctor.innerHTML = html;
-                    })
-                    .catch(err => console.error(err));
-            });
+                    }
+                });
+            }
 
         });
+
+
+        // ===========================
+        // CARGAR HORARIO DEL DOCTOR
+        // ===========================
+        $("#ddlDoctor").change(function () {
+            let idDoctor = $(this).val();
+            cargarHorarioDoctor(idDoctor);
+        });
+
+        function cargarHorarioDoctor(idDoctor) {
+
+            if (!idDoctor) {
+                $("#doctor-horario").hide();
+                return;
+            }
+
+            $.ajax({
+                url: '/Citas/GetHorarioDoctor',
+                type: 'GET',
+                data: { idDoctor: idDoctor },
+                success: function (data) {
+
+                    if (!data || data.length === 0) {
+                        $("#doctor-horario")
+                            .html("<div class='alert alert-warning mt-2'>El doctor no tiene horario registrado.</div>")
+                            .show();
+                        return;
+                    }
+
+                    let html = `
+                        <h4>Horario del Doctor</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Inicio</th>
+                                    <th>Fin</th>
+                                    <th>Consultorio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    $.each(data, function (i, h) {
+                        html += `
+                            <tr>
+                                <td>${h.dia}</td>
+                                <td>${h.inicio}</td>
+                                <td>${h.fin}</td>
+                                <td>${h.consultorio}</td>
+                            </tr>`;
+                    });
+
+                    html += "</tbody></table>";
+
+                    $("#doctor-horario").html(html).show();
+                }
+            });
+        }
+
     </script>
-
-
-
 }
