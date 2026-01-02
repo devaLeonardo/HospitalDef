@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 
 namespace HospitalDef.Models;
 
@@ -58,6 +60,10 @@ public partial class HospitalContext : DbContext
     public virtual DbSet<RecetasAtendidas> RecetasAtendidas { get; set; }
     public DbSet<HistorialMedicoPacienteVM> HistorialMedicoPacienteParaDoctor { get; set; }
 
+    public virtual DbSet<getMedicamentos_Servicios> getMedicamentos_Servicios { get; set; }
+
+    public virtual DbSet<spMED_SER> SpMED_SER { get; set; }
+
 
 
 
@@ -67,7 +73,7 @@ public partial class HospitalContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-       
+
         modelBuilder.Entity<BitacoraCita>(entity =>
         {
             entity.HasKey(e => e.IdBitacoraCitas).HasName("PK__Bitacora__6F8088F7D3791E11");
@@ -574,9 +580,9 @@ public partial class HospitalContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("telefono");
         });
-            modelBuilder.Entity<VistaDoctorHorario>()
-            .HasNoKey()
-            .ToView("VistaDoctoresHorario");
+        modelBuilder.Entity<VistaDoctorHorario>()
+        .HasNoKey()
+        .ToView("VistaDoctoresHorario");
 
         OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<VistaDoctor>(entity =>
@@ -595,10 +601,58 @@ public partial class HospitalContext : DbContext
            .HasNoKey()
            .ToView("HistorialMedicoPacienteParaDoctor");
 
+
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<getMedicamentos_Servicios>(entity =>
+        {
+            entity.HasNoKey(); 
+            entity.ToView(null); 
+        });
+
+        base.OnModelCreating(modelBuilder);
+
+
+        modelBuilder.Entity<spMED_SER>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView(null); 
+        });
+
+        base.OnModelCreating(modelBuilder);
+
+        // Configuración del trigger para actualizar el stock del medicamento
+        modelBuilder.Entity<Medicamento>()
+        .ToTable(tb => tb.HasTrigger("tr_ActualizarStock_Medicamento"));
+
+        // Para la tabla de Detalles (si pusiste el trigger ahí)
+        modelBuilder.Entity<DetallesMedicamento>()
+            .ToTable(tb => tb.HasTrigger("tr_ActualizarStock_Medicamento"));
+
+        base.OnModelCreating(modelBuilder);
+
+
 
     }
 
 
+
+
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
+    public List<getMedicamentos_Servicios> SP_getMedicamentos_Servicios(string data)
+    {
+        return this.getMedicamentos_Servicios
+            .FromSqlInterpolated($"EXEC spBuscador_MS {data}") 
+            .AsNoTracking() 
+            .ToList();
+    }
+    public List<spMED_SER> SP_obtenerDetalles(int data)
+    {
+        return this.SpMED_SER
+            .FromSqlInterpolated($"EXEC spMedicamentoServicio {data}")
+            .AsNoTracking()
+            .ToList();
+    }
 }

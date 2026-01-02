@@ -1,23 +1,180 @@
 ﻿@{
      ViewData["Title"] = "Home Page";
 }
+<style>
+    /* Efecto en las tarjetas de servicio */
+    /* Estilos para las Tarjetas de Especialidades */
+    .service-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
 
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+            border-color: rgba(0, 120, 212, 0.3); /* Color sutil azul al hover */
+        }
 
-<section class="hero py-5">
-    <div class="container-fluid">
+            /* Efecto en el icono al pasar el mouse */
+            .service-card:hover .icon-box {
+                transform: scale(1.1) rotate(10deg);
+                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+    /* Ajuste para móviles para que no se vean tan grandes */
+    @@media (max-width: 768px) {
+        .service-card h6
+
+    {
+        font-size: 0.9rem;
+    }
+
+    }
+</style>
+
+<section class="hero shadow-lg">
+    <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-7 text-white">
-                <h1 class="hero-title mb-2">Atención médica integral</h1>
-                <p class="lead hero-sub">Equipo profesional y tecnología a tu servicio. Atención de urgencias y consulta especializada.</p>
-                <p class="lead hero-sub">Recuerda que para agendar una cita es necesario registrarse o iniciar sesion.</p>
-                <div class="mt-4">
-                    <a class="btn btn-light btn-lg me-2" asp-controller="Acceso" asp-action="Login">Agendar una Cita</a>
-                    <a class="btn btn-outline-light btn-lg" asp-controller="Home" asp-action="Privacy">Contáctanos</a>
+            <div class="col-lg-7 text-white animate__animated animate__fadeInLeft">
+                <span class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+                    <i class="bi bi-star-fill me-1"></i> Excelencia Médica
+                </span>
+                <h1 class="hero-title mb-3">Atención médica <br><span class="text-info">integral</span></h1>
+                <p class="lead hero-sub mb-4">
+                    Equipo profesional y tecnología de vanguardia a tu servicio. Especialistas comprometidos con tu bienestar físico y emocional.
+                </p>
+
+                <div class="alert alert-light bg-opacity-10 border-0 text-white p-3 mb-4" style="background: var(--glass-bg); backdrop-filter: blur(5px);">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Para agendar una cita es necesario registrarse o iniciar sesión.
+                </div>
+
+                <div class="d-flex gap-3 mt-2">
+                    <a class="btn btn-light btn-lg shadow-sm" asp-controller="Acceso" asp-action="Login">
+                        <i class="bi bi-calendar-check me-2"></i>Agendar Cita
+                    </a>
+                    <a class="btn btn-outline-light btn-lg" asp-controller="Home" asp-action="Privacy">
+                        Contáctanos
+                    </a>
                 </div>
             </div>
-            <div class="col-lg-5 d-none d-lg-block text-end">
-                <img src="~/images/hero.jpg" alt="Hospital" class="img-fluid rounded shadow-lg hero-img" asp-append-version="true" />
+
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="position-relative">
+                    <img src="~/images/hero.jpg" alt="Hospital" class="img-fluid rounded-4 shadow-lg hero-img" asp-append-version="true" />
+                    
+                </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="services-section py-5 bg-light position-relative">
+    <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden" style="pointer-events: none; z-index: 0;">
+        <div class="bg-primary opacity-10 position-absolute rounded-circle" style="width: 400px; height: 400px; top: -100px; right: -100px; opacity: 0.05;"></div>
+        <div class="bg-info opacity-10 position-absolute rounded-circle" style="width: 300px; height: 300px; bottom: 50px; left: -50px; opacity: 0.05;"></div>
+    </div>
+
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="text-center mb-5 animate__animated animate__fadeIn">
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3">Especialidades Médicas</span>
+            <h2 class="display-6 fw-bold text-dark">Nuestros Servicios</h2>
+            <p class="text-muted">Atención integral para cada etapa de tu vida.</p>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
+
+            <div class="col animate__animated animate__fadeInUp">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-hospital fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">General</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-emoji-smile fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Pediatría</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-heart-pulse fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Cardiología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-diagram-3 fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Neurología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-gender-female fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Ginecología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-eye fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Oftalmología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-bandaid fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Traumatología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-chat-heart fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Psiquiatría</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-dark bg-opacity-10 text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-stars fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Oncología</h6>
+                </div>
+            </div>
+
+            <div class="col animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="service-card p-4 text-center rounded-4 h-100 bg-white">
+                    <div class="icon-box mb-3 mx-auto bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-droplet-half fs-4"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0">Endocrinología</h6>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>

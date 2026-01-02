@@ -1,58 +1,271 @@
 ﻿@model IEnumerable<HospitalDef.Models.Ticket>
 
 @{
+    ViewData["Title"] = "Recibo";
 }
 
-<h1>Index</h1>
+<style>
+    /* Estilos personalizados para el look moderno */
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 1rem; }
+    .bg-gradient-primary { background: linear-gradient(45deg, #0d6efd, #0dcaf0); }
+    .table-hover tbody tr:hover { background-color: #f1f4f9; cursor: pointer; }
+    .btn-rounded { border-radius: 50px; }
+    .shadow-hover { transition: transform 0.2s, box-shadow 0.2s; }
+    .shadow-hover:hover { transform: translateY(-2px); box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important; }
+    .scroll-custom::-webkit-scrollbar { width: 6px; }
+    .scroll-custom::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 10px; }
+</style>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Fecha)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Hora)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumCliente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Total)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdUsuarioNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fecha)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Hora)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumCliente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Total)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdUsuarioNavigation.IdUsuario)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.FolioTicket">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.FolioTicket">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.FolioTicket">Delete</a>
-            </td>
-        </tr>
+<div class="container-fluid px-4 py-5">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold text-dark mb-1">Catálogo de Servicios</h5>
+                    <p class="text-muted small">Encuentra medicamentos o servicios médicos rápidamente</p>
+                    
+                    <div class="input-group mt-3 mb-2 shadow-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-white border-0 ps-3">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="buscarMedSer" class="form-control border-0 py-2 shadow-none" 
+                               placeholder="Escribe el nombre del medicamento o servicio..." />
+                    </div>
+                </div>
+
+                <div class="card-body px-0">
+                    <div class="table-responsive scroll-custom" style="max-height: 550px;">
+                        <table class="table table-hover align-middle mb-0" id="tablaResultados">
+                            <thead class="bg-light sticky-top">
+                                <tr>
+                                    <th class="ps-4 border-0 text-muted small fw-bold text-uppercase">Nombre</th>
+                                    <th class="border-0 text-muted small fw-bold text-uppercase">Precio</th>
+                                    <th class="border-0 text-muted small fw-bold text-uppercase">Categoría</th>
+                                    <th class="border-0 text-end pe-4"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="fas fa-keyboard fa-2x mb-3 d-block opacity-25"></i>
+                                        Comienza a escribir para buscar...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg h-100 d-flex flex-column rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-gradient-primary p-4 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white bg-opacity-25 p-3 shadow-sm me-3 text-white">
+                            <i class="fas fa-file-invoice-dollar fa-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-white">Ticket de Venta</h5>
+                            <small class="text-white-50">Resumen de cargos actuales</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0 flex-grow-1">
+                    <div id="listaCarrito" class="table-responsive scroll-custom" style="max-height: 400px;">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody id="cuerpoCarrito">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="carritoVacio" class="text-center py-5">
+                        <i class="fas fa-shopping-basket fa-3x text-light mb-3"></i>
+                        <p class="text-muted">El carrito está vacío</p>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white p-4 border-0 shadow-lg mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="text-muted d-block small uppercase fw-bold">Total a Pagar</span>
+                            <span id="totalCarrito" class="h3 fw-bold text-primary mb-0">$0.00</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-dark border p-2 rounded-3">
+                                <i class="far fa-calendar-alt me-1"></i> @DateTime.Now.ToString("dd/MM/yyyy")
+                            </span>
+                        </div>
+                    </div>
+                    <button onclick="finalizarTicket()" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm shadow-hover">
+                        <i class="fas fa-check-circle me-2"></i> Confirmar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let timer;
+        let carrito = [];
+
+        document.getElementById("buscarMedSer").addEventListener("input", function () {
+            const filtro = this.value;
+            const tablaCuerpo = document.querySelector("#tablaResultados tbody");
+
+            clearTimeout(timer);
+
+            timer = setTimeout(async () => {
+                if (filtro.length < 2) {
+                    tablaCuerpo.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-keyboard fa-2x mb-3 d-block opacity-25"></i>Comienza a escribir para buscar...</td></tr>`;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/Tickets/BuscarMedicamentos?termino=${encodeURIComponent(filtro)}`);
+                    if (!response.ok) throw new Error("Error en el servidor");
+                    const data = await response.json();
+
+                    tablaCuerpo.innerHTML = "";
+
+                    if (data.length === 0) {
+                        tablaCuerpo.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">No se encontraron resultados para "${filtro}"</td></tr>`;
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const fila = `
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">${item.nombre}</td>
+                                <td class="text-primary fw-medium">$ ${item.precio ? item.precio.toLocaleString() : '0.00'}</td>
+                                <td><span class="badge bg-light text-secondary border">${item.tipo}</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-rounded btn-outline-success px-3 shadow-sm"
+                                            onclick="seleccionar('${item.id}', \`${item.nombre}\`, '${item.precio}', '${item.tipo}')">
+                                        <i class="fas fa-plus me-1"></i> Agregar
+                                    </button>
+                                </td>
+                            </tr>`;
+                        tablaCuerpo.insertAdjacentHTML('beforeend', fila);
+                    });
+
+                } catch (error) {
+                    console.error("Error al buscar:", error);
+                }
+            }, 300);
+        });
+
+        function seleccionar(id, nombre, precio, tipo) {
+            const existe = carrito.find(item => item.nombre === nombre && item.tipo === "Servicio");
+            if (existe) {
+                Swal.fire({ title: 'Ya agregado', text: 'Este servicio ya está en tu resumen.', icon: 'info', confirmButtonColor: '#0d6efd' });
+                return;
+            }
+
+            carrito.push({ id, nombre, precio: parseFloat(precio || 0), tipo });
+
+            Toast.fire({ icon: 'success', title: 'Agregado al ticket' });
+            actualizarCarrito();
+        }
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+        });
+
+        function actualizarCarrito() {
+            const cuerpo = document.getElementById("cuerpoCarrito");
+            const totalDisplay = document.getElementById("totalCarrito");
+            const divVacio = document.getElementById("carritoVacio");
+
+            cuerpo.innerHTML = "";
+            let total = 0;
+
+            if (carrito.length === 0) {
+                divVacio.classList.remove('d-none');
+            } else {
+                divVacio.classList.add('d-none');
+            }
+
+            carrito.forEach((item, index) => {
+                total += item.precio;
+                cuerpo.innerHTML += `
+                    <tr class="border-bottom">
+                        <td class="ps-4 py-3">
+                            <span class="d-block fw-bold text-dark">${item.nombre}</span>
+                            <span class="text-muted tiny uppercase" style="font-size: 0.7rem;">${item.tipo}</span>
+                        </td>
+                        <td class="text-end fw-bold text-dark">$${item.precio.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-danger text-danger rounded-circle border shadow-sm" onclick="eliminar(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+
+            totalDisplay.innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        }
+
+        function eliminar(index) {
+            carrito.splice(index, 1);
+            actualizarCarrito();
+        }
+
+                async function finalizarTicket() {
+            if (carrito.length === 0) {
+                Swal.fire("Carrito vacío", "Debes agregar al menos un ítem para continuar.", "warning");
+                return;
+            }
+
+            const totalTicket = carrito.reduce((sum, item) => sum + item.precio, 0);
+
+            const datosParaEnviar = {
+                Total: totalTicket,
+                Items: carrito // Este es tu arreglo que contiene {id, nombre, precio, tipo}
+            };
+
+            try {
+                const response = await fetch('/Tickets/GuardarTicket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // OBLIGATORIO para que C# entienda el JSON
+                    },
+                    body: JSON.stringify(datosParaEnviar) // Convertimos el objeto a texto JSON
+                });
+
+                if (response.ok) {
+                    const resultado = await response.json();
+
+                    if (resultado.success) {
+                        Swal.fire("¡Venta Exitosa!", `Se ha generado el ticket número: ${resultado.folio}`, "success")
+                        .then(() => {
+                            // Limpiamos todo para una nueva venta
+                            carrito = [];
+                            actualizarCarrito();
+                            window.location.href = `/Tickets/generarPdf?id=${resultado.folio}`;
+                        });
+                    } else {
+                        Swal.fire("Error", "No se pudo guardar: " + resultado.mensaje, "error");
+                    }
+                } else {
+                    throw new Error("Error en la respuesta del servidor");
+                }
+            } catch (error) {
+                console.error("Hubo un error:", error);
+                Swal.fire("Error", "No se pudo conectar con el servidor", "error");
+            }
+        }
+    </script>
 }
-    </tbody>
-</table>
+

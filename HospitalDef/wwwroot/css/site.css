@@ -34,7 +34,70 @@ body {
     --card: #ffffff;
     --radius: 0.7rem;
 }
+/* Variables de color modernas */
+:root {
+    --primary-gradient: linear-gradient(135deg, #0078d4 0%, #00bcf2 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+}
 
+/* Hero Section con profundidad */
+.hero {
+    background: var(--primary-gradient);
+    border-radius: 0 0 50px 50px; /* Curva elegante al final de la sección */
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Efecto de círculos decorativos de fondo */
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 300px;
+        height: 300px;
+        background: var(--glass-bg);
+        border-radius: 50%;
+    }
+
+.hero-title {
+    font-weight: 800;
+    font-size: 3.5rem;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.hero-sub {
+    font-weight: 300;
+    opacity: 0.9;
+    max-width: 600px;
+}
+
+/* Animación y sombra para la imagen */
+.hero-img {
+    transition: transform 0.5s ease;
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+    .hero-img:hover {
+        transform: translateY(-10px) scale(1.02);
+    }
+
+/* Botones más modernos */
+.btn-lg {
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
 
 html, body {
     height: 100%;
@@ -240,3 +303,44 @@ footer {
 .table, .table th, .table td {
     border-color: rgba(15,37,64,0.04);
 }
+
+/* Contenedor Principal del Sidebar */
+.sidebar-modern {
+    width: 280px;
+    min-height: 85vh; /* Ocupa buena altura */
+    border-radius: 20px; /* Bordes redondeados modernos */
+    background: linear-gradient(160deg, #004e92 0%, #000428 100%); /* Azul profundo profesional */
+    position: sticky;
+    top: 20px; /* Se queda fijo al bajar */
+    margin-right: 20px; /* Separación del contenido */
+}
+/* ... el estilo del .sidebar-modern queda igual ... */
+
+.nav-link-custom {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    /* CAMBIO AQUÍ: de 0.3s a 0.1s (100 milisegundos) */
+    transition: all 0.1s ease-out;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+}
+
+    .nav-link-custom:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        /* Movimiento más corto para que se sienta más rápido */
+        transform: translateX(3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .nav-link-custom i {
+        /* CAMBIO AQUÍ: Icono ultrarrápido */
+        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .nav-link-custom:hover i {
+        transform: scale(1.15) rotate(-5deg);
+    }

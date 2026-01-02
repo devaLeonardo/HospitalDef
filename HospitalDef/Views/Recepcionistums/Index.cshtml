@@ -9,47 +9,68 @@
 <div class="dashboard-container">
 
     <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="menu-title">Menu</h2>
+    <div class="sidebar-modern d-flex flex-column flex-shrink-0 p-3 text-white shadow-lg">
+        <a href="/" class="d-flex align-items-center mb-4 mb-md-0 me-md-auto text-white text-decoration-none animate__animated animate__fadeInLeft animate__faster">
+            <div class="icon-brand bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                <i class="bi bi-person-workspace fs-5"></i>
+            </div>
+            <span class="fs-4 fw-bold">Recepción</span>
+        </a>
+
+        <div class="nav flex-column mb-auto gap-1">
+
+            <div class="small text-uppercase text-white-50 fw-bold mt-2 mb-1 ms-2 animate__animated animate__fadeInLeft animate__faster" style="font-size: 0.75rem; animation-delay: 0.1s;">
+                Gestión de Usuarios
+            </div>
+
+            <a asp-controller="Usuarios" asp-action="CreateUsuario" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.15s">
+                <i class="bi bi-person-plus-fill fs-5"></i>
+                <span>Crear Usuario</span>
+            </a>
+
+            <a asp-controller="vistaDoctores" asp-action="Index" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.2s">
+                <i class="bi bi-person-hearts fs-5"></i>
+                <span>Doctores</span>
+            </a>
+
+            <a asp-controller="Pacientes" asp-action="ListadoPacientes" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.25s">
+                <i class="bi bi-people-fill fs-5"></i>
+                <span>Pacientes</span>
+            </a>
+
+            <div class="small text-uppercase text-white-50 fw-bold mt-3 mb-1 ms-2 animate__animated animate__fadeInLeft animate__faster" style="font-size: 0.75rem; animation-delay: 0.3s;">
+                Consultas y Citas
+            </div>
+
+            <a asp-controller="Citas" asp-action="Create" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.35s">
+                <i class="bi bi-calendar-plus-fill fs-5"></i>
+                <span>Agendar Cita</span>
+            </a>
+
+            <a asp-controller="Citas" asp-action="Cancelar" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.4s">
+                <i class="bi bi-calendar-week-fill fs-5"></i>
+                <span>Visualizar Citas</span>
+            </a>
+
+            <a asp-controller="HistorialCitasMedicoPacientes" asp-action="Index" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.45s">
+                <i class="bi bi-journal-medical fs-5"></i>
+                <span>Bitácora</span>
+            </a>
+
+            <div class="small text-uppercase text-white-50 fw-bold mt-3 mb-1 ms-2 animate__animated animate__fadeInLeft animate__faster" style="font-size: 0.75rem; animation-delay: 0.5s;">
+                Administración
+            </div>
+
+            <a asp-controller="RecetasAtendidas" asp-action="Index" class="nav-link-custom d-flex align-items-center gap-3 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.55s">
+                <i class="bi bi-file-earmark-medical-fill fs-5"></i>
+                <span>Recetas Atendidas</span>
+            </a>
         </div>
 
-        <div class="menu-section">
-            <p class="section-label">Gestión de Usuarios</p>
-            <a class="menu-btn" asp-controller="Usuarios" asp-action="CreateUsuario">
-                <i class="fas fa-user-plus"></i> Crear Usuario
-            </a>
-            <a class="menu-btn" asp-controller="vistaDoctores" asp-action="Index">
-                <i class="fas fa-user-md"></i> Doctores
-            </a>
-            <a class="menu-btn" asp-controller="Pacientes" asp-action="ListadoPacientes">
-                <i class="fas fa-user-injured"></i> Pacientes
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <p class="section-label">Consultas y Citas</p>
-            <a class="menu-btn active" asp-controller="Citas" asp-action="Create">
-                <i class="fas fa-calendar-plus"></i> Agendar Cita
-            </a>
-            <a class="menu-btn" asp-controller="Citas" asp-action="Cancelar">
-                <i class="fas fa-calendar-check"></i> Visualizar Citas
-            </a>
-            <a class="menu-btn" asp-controller="HistorialCitasMedicoPacientes" asp-action="Index">
-                <i class="fas fa-book-medical"></i> Bitácora
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <p class="section-label">Administración</p>
-            <a class="menu-btn" asp-controller="RecetasAtendidas" asp-action="Index">
-                <i class="fas fa-file-prescription"></i> Recetas Atendidas
-            </a>
-        </div>
-
-        <div class="sidebar-footer">
-            <a class="menu-btn profile-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesRecep">
-                <i class="fas fa-id-card"></i> Mis Datos
+        <div class="mt-4 pt-3 border-top border-white border-opacity-10 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.6s">
+            <a asp-controller="Empleadoes" asp-action="DatosPersonalesRecep" class="nav-link-custom d-flex align-items-center gap-3">
+                <i class="bi bi-person-vcard fs-5"></i>
+                <span>Mis Datos</span>
             </a>
         </div>
     </div>

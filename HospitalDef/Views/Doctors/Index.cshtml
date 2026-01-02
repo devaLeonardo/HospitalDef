@@ -9,13 +9,42 @@
 
 <div class="dashboard-container">
 
-    <div class="sidebar">
-        <h2 class="menu-title">Menú</h2>
+    <div class="sidebar-modern d-flex flex-column flex-shrink-0 p-3 text-white shadow-lg">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none animate__animated animate__fadeInLeft animate__faster">
+            <div class="icon-brand bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                <i class="bi bi-heart-pulse-fill fs-5"></i>
+            </div>
+            <span class="fs-4 fw-bold">Panel Médico</span>
+        </a>
 
-        
-        <a class="menu-btn" asp-controller="Citas" asp-action="Index">Citas pendientes</a>
-        <a class="menu-btn" asp-controller="HistorialMedicoPacienteVM" asp-action="Index">Pacientes</a>
-        <a class="menu-btn" asp-controller="Empleadoes" asp-action="DatosPersonalesDoctor">Datos personales</a>
+        <hr class="border-white opacity-25">
+
+        <ul class="nav nav-pills flex-column mb-auto gap-2">
+            <li class="nav-item animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.1s">
+                <a asp-controller="Citas" asp-action="Index" class="nav-link-custom d-flex align-items-center gap-3">
+                    <i class="bi bi-calendar-check fs-5"></i>
+                    <span>Citas Pendientes</span>
+                </a>
+            </li>
+
+            <li class="nav-item animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.2s">
+                <a asp-controller="HistorialMedicoPacienteVM" asp-action="Index" class="nav-link-custom d-flex align-items-center gap-3">
+                    <i class="bi bi-people-fill fs-5"></i>
+                    <span>Pacientes</span>
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 pt-3 border-top border-white border-opacity-10 animate__animated animate__fadeInLeft animate__faster" style="animation-delay: 0.3s">
+                <a asp-controller="Empleadoes" asp-action="DatosPersonalesDoctor" class="nav-link-custom d-flex align-items-center gap-3">
+                    <i class="bi bi-person-vcard fs-5"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="mt-auto pt-4 text-center opacity-50 small">
+            <p>© 2026 Hospital System</p>
+        </div>
     </div>
 
     <div class="container py-5">
