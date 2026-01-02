@@ -287,6 +287,43 @@
             });
         });
     </script>
+    <script>
+        $(document).ready(function () {
+
+            var tbody = $("table tbody");
+
+ 
+            if (tbody.find("tr").length === 0) return;
+
+            var filas = tbody.find("tr").toArray();
+
+            filas.sort(function (a, b) {
+
+                function prioridad(fila) {
+                    var estatusTexto = $(fila)
+                        .find(".columna-estatus")
+                        .text()
+                        .trim()
+                        .toUpperCase();
+
+                    if (estatusTexto.includes("PENDIENTE"))
+                        return 1;
+
+                    if (estatusTexto.includes("PAGADO"))
+                        return 2;
+
+                    return 3;
+                }
+
+                return prioridad(a) - prioridad(b);
+            });
+
+            tbody.empty();
+            $(filas).each(function () {
+                tbody.append(this);
+            });
+        });
+    </script>
 
 
 

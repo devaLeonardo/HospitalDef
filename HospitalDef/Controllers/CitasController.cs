@@ -701,8 +701,7 @@ namespace HospitalDef.Controllers
 
 
 
-                if (
-                    cita.estatusAtencion.Contains("Cancelada")) 
+                if (cita.estatusAtencion.Contains("Cancelada")) 
                 {
 
                     return Json(new { ok = false, mensaje = "La cita NO ha sido pagada previamente o ha sido cancelada" });
@@ -710,6 +709,38 @@ namespace HospitalDef.Controllers
                 }
 
                 cita.estatusAtencion = "Cancelada por el Doctor";
+                // Normalizamos el estatus
+                var estatus = cita.estatusAtencion?.Trim();
+
+              
+                if (string.Equals(estatus, "Atendida", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Json(new
+                    {
+                        ok = false,
+                        mensaje = "No se puede cancelar una cita que ya fue atendida."
+                    });
+                }
+
+                if (estatus != null && estatus.Contains("Cancelada", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Json(new
+                    {
+                        ok = false,
+                        mensaje = "La cita ya se encuentra cancelada."
+                    });
+                }
+
+             
+                cita.estatusAtencion = "Cancelada por el Doctor";
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    ok = true,
+                    mensaje = "La cita ha sido cancelada con éxito."
+                });
 
                 await _context.SaveChangesAsync();
 
