@@ -12,11 +12,13 @@ INSERT INTO Citas
 VALUES
 (
     20,                          -- idPaciente
-    12,                          -- idDoctor
+    1,                          -- idDoctor
     GETDATE(),                  -- fechaCreacionCita (hoy)
     CAST(GETDATE() AS DATE),    -- fechaCita (hoy)
-    '17:05',                    -- horaCita
-    '17:05',                    -- horaInicio
-    '17:50',                    -- horaTermino
+    '1:52',                    -- horaCita
+    '1:52',                    -- horaInicio
+    '2:52',                    -- horaTermino
     'PAGADO'                 -- estatusAtencion
 );
+
+
