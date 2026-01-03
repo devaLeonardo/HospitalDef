@@ -1,47 +1,54 @@
 ﻿@model IEnumerable<HospitalDef.Models.Consultorio>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Consultorios";
 }
 
-<h1>Index</h1>
+<h2 class="mb-4 text-primary">Listado de Consultorios</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Planta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Numero)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Edificio)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Planta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Numero)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Edificio)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdConsultorio">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdConsultorio">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdConsultorio">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Dirección</th>
+                <th>Edificio</th>
+                <th>Planta</th>
+                <th>Consultorio</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">
+                            🏥 Edificio @item.Edificio · Planta @item.Planta · Consultorio @item.Numero
+                        </td>
+                        <td class="text-center">
+                            @item.Edificio
+                        </td>
+                        <td class="text-center">
+                            @item.Planta
+                        </td>
+                        <td class="text-center">
+                            @item.Numero
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No hay consultorios registrados
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between mt-4">
+    <a asp-controller="Recepcionistums" asp-action="Index" class="btn btn-outline-secondary">Volver a mi modulo</a>
+</div>
