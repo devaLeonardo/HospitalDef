@@ -14,11 +14,27 @@
         <div class="card-body">
 
             @Html.AntiForgeryToken()
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <input type="text" id="buscador"
+                           class="form-control"
+                           placeholder="Buscar por doctor, paciente o fecha (dd/mm/yyyy)">
+                </div>
+
+                <div class="col-md-3">
+                    <select id="ordenFecha" class="form-select">
+                        <option value="">Ordenar por fecha</option>
+                        <option value="reciente">Más reciente</option>
+                        <option value="antigua">Más antigua</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table class="table table-striped table-hover align-middle">
                     <thead class="table-dark text-center">
-                        <tr>
+
+                        <tr >
                             <th>Fecha</th>
                             <th>Hora</th>
                             <th>Estatus</th>
@@ -27,6 +43,7 @@
                             <th>Paciente</th>
                             <th>Acción</th>
                         </tr>
+                    
                     </thead>
 
                     <tbody>
@@ -37,20 +54,27 @@
                             !item.Estatus.Contains("Cancelada") &&
                             !item.Estatus.Contains("Atendida");
 
-                            <tr id="fila-@item.IdCita">
+                            <tr id="fila-@item.IdCita"
+                                data-fecha="@item.Fecha.ToString("yyyy-MM-dd")"
+                                data-estatus="@item.Estatus"
+                                data-doctor="@item.Doctor"
+                                data-paciente="@item.Paciente">
+
                                 <td class="text-center">@item.Fecha.ToString("dd/MM/yyyy")</td>
                                 <td class="text-center">@item.Hora</td>
+
                                 <td class="text-center">
                                     <span class="badge
-                                        @(item.Estatus != null && item.Estatus.Contains("Atendida") ? "bg-success" :
-                                                                                item.Estatus != null && item.Estatus.Contains("Cancelada") ? "bg-danger" :
-                                                                                "bg-secondary")">
+                    @(item.Estatus != null && item.Estatus.Contains("Atendida") ? "bg-success" :
+                                                            item.Estatus != null && item.Estatus.Contains("Cancelada") ? "bg-danger" :
+                                                            "bg-secondary")">
                                     @(item.Estatus ?? "Sin estatus")
                                 </span>
                             </td>
-                            <td>@(item.Doctor ?? "—")</td>
-                            <td class="text-center">@(item.Consultorio ?? "—")</td>
-                            <td>@(item.Paciente ?? "—")</td>
+
+                                <td>@(item.Doctor ?? "—")</td>
+                                <td class="text-center">@(item.Consultorio ?? "—")</td>
+                                <td>@(item.Paciente ?? "—")</td>
 
                                 <td class="text-center">
                                 @if (cancelable)
@@ -68,6 +92,7 @@
                             </tr>
                         }
                     </tbody>
+
                 </table>
             </div>
 
@@ -133,4 +158,53 @@
             });
         }
     </script>
+    <script>
+        const buscador = document.getElementById("buscador");
+        const ordenFecha = document.getElementById("ordenFecha");
+        const tbody = document.querySelector("tbody");
+
+        // 🔥 Ordenar al cargar: MÁS RECIENTE primero
+        ordenarPorFecha("reciente");
+
+        function filtrarYOrdenar() {
+            let texto = buscador.value.toLowerCase();
+            let filas = Array.from(tbody.querySelectorAll("tr"));
+
+            // 🔍 FILTRAR
+            filas.forEach(fila => {
+                const doctor = (fila.dataset.doctor || "").toLowerCase();
+                const paciente = (fila.dataset.paciente || "").toLowerCase();
+                const fecha = fila.dataset.fecha || "";
+
+                const coincide =
+                    doctor.includes(texto) ||
+                    paciente.includes(texto) ||
+                    fecha.includes(texto.replaceAll("/", "-"));
+
+                fila.style.display = coincide ? "" : "none";
+            });
+
+            
+            ordenarPorFecha(ordenFecha.value);
+        }
+
+        function ordenarPorFecha(tipo) {
+            if (!tipo) return;
+
+            let filas = Array.from(tbody.querySelectorAll("tr"));
+
+            filas.sort((a, b) => {
+                const fa = new Date(a.dataset.fecha);
+                const fb = new Date(b.dataset.fecha);
+                return tipo === "reciente" ? fb - fa : fa - fb;
+            });
+
+            filas.forEach(f => tbody.appendChild(f));
+        }
+
+        buscador.addEventListener("input", filtrarYOrdenar);
+        ordenFecha.addEventListener("change", filtrarYOrdenar);
+    </script>
+
+
 }

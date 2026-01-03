@@ -49,9 +49,11 @@ namespace HospitalDef.Controllers
 
                 var citasDoc = await _context.Citas
                        .Where(c => c.idDoctor == doctor.IdDoctor)
+                       .OrderByDescending(c => c.fechaCita)
+                       .ThenByDescending(c => c.horaCita)
                        .Include(c=>c.IdPacienteNavigation)
                        .Include(c => c.IdDoctorNavigation)
-                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                       .ThenInclude(d => d.IdEmpleadoNavigation)
                        .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
                            .Include(c => c.IdDoctorNavigation)
                            .ThenInclude(d => d.IdEmpleadoNavigation)
@@ -74,8 +76,10 @@ namespace HospitalDef.Controllers
 
                 var citasPac = await _context.Citas
                        .Where(c => c.idPaciente == paciente.IdPaciente)
+                       .OrderByDescending(c => c.fechaCita)
+                       .ThenByDescending(c => c.horaCita)
                        .Include(c => c.IdDoctorNavigation)
-                           .ThenInclude(d => d.IdEmpleadoNavigation)
+                       .ThenInclude(d => d.IdEmpleadoNavigation)
                        .Include(c => c.IdDoctorNavigation.IdEspecialidadNavigation)
                            .Include(c => c.IdDoctorNavigation)
                            .ThenInclude(d => d.IdEmpleadoNavigation)
@@ -672,7 +676,11 @@ namespace HospitalDef.Controllers
         [HttpGet]
         public async Task<IActionResult> Cancelar()
         {
-            var citas = await _context.HistorialCitasMedicoPacientes.ToListAsync();
+            var citas = await _context.HistorialCitasMedicoPacientes
+                .OrderByDescending(c => c.Fecha)
+                .ThenByDescending(c => c.Hora)
+                .ToListAsync();
+
             return View(citas);
         }
 
