@@ -192,7 +192,9 @@
                         if (respuesta.ok) {
                             $("#mensajePago").text(respuesta.mensaje);
                             $("#alertaPago").fadeIn();
+                            window.location.href = `/Citas/generarPdf?id=${folio}`;
                             setTimeout(() => location.reload(), 1500);
+
                         } else {
                             Swal.fire({
                                 title: 'Información',

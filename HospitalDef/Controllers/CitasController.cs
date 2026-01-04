@@ -3,23 +3,218 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Drawing;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace HospitalDef.Controllers
 {
     public class CitasController : Controller
     {
         private readonly HospitalContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public CitasController(HospitalContext context)
+
+        public CitasController(HospitalContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
+
+
+
+        public async Task<IActionResult> generarPDF(int id)
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjGyl/Vkd+XU9FcVRDQmJKYVF2R2VJelRyfF9FZ0wxOX1dQl9mSHxSckRkW3ZeeHRWQWFXUkU=");
+
+            var citaPDF = await _context.Citas
+                .Include(r => r.IdPacienteNavigation)
+                .Include(r => r.IdDoctorNavigation)
+                .ThenInclude(d => d.IdEspecialidadNavigation)
+                 .Include(r => r.IdDoctorNavigation)
+                .ThenInclude(e => e.IdEmpleadoNavigation)
+                .Include(r => r.IdDoctorNavigation)
+                .ThenInclude(e => e.IdConsultorioNavigation)
+                .FirstOrDefaultAsync(m => m.FolioCitas == id);
+
+            var fecha = citaPDF?.fechaCita.ToString("dd/MM/yyyy");
+
+            DateTime? fechaCita = citaPDF?.fechaCita;
+            
+
+
+
+
+            PdfDocument pdfDocument = new PdfDocument();
+            PdfPage currentPage = pdfDocument.Pages.Add();
+            SizeF clientSize = currentPage.GetClientSize();
+
+            //aqui se agrega la imagen
+
+            string webRootPath = _hostEnvironment.WebRootPath; // Obtiene la ruta a wwwroot
+            string rutaFisicaImagen = Path.Combine(webRootPath, "images", "logo.png");
+
+            PdfImage icon = null;
+            FileStream imageStream = null;
+
+            try
+            {
+                // Verifica que la imagen exista
+                if (System.IO.File.Exists(rutaFisicaImagen))
+                {
+                    imageStream = new FileStream(rutaFisicaImagen, FileMode.Open, FileAccess.Read);
+                    icon = new PdfBitmap(imageStream);
+                    // ... (Tu código de dibujo continúa)
+                }
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores: Si la imagen no carga, continúa sin ella.
+                System.Diagnostics.Debug.WriteLine($"Error al cargar la imagen: {ex.Message}");
+            }
+            finally
+            {
+                // Es importante cerrar el stream después de usarlo
+                imageStream?.Dispose();
+            }
+
+            // Dibuja la imagen SOLO si se cargó correctamente
+            PdfGraphics graphics = currentPage.Graphics;
+
+            SizeF iconSize = new SizeF(80, 80);
+            PointF iconLocation = new PointF(14, 13);
+            graphics.DrawImage(icon, iconLocation, iconSize);
+
+
+
+
+            //aqui se agrega la fecha
+
+
+            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            var text = new PdfTextElement(fecha, font);
+            text.StringFormat = new PdfStringFormat(PdfTextAlignment.Right);
+            PdfLayoutResult result = text.Draw(currentPage, new PointF(clientSize.Width - 25, iconLocation.Y + 10));
+
+
+            //titulo de receta medica
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 16, PdfFontStyle.Bold);
+            text = new PdfTextElement("Comprobante de Cita", font);
+            text.StringFormat = new PdfStringFormat(PdfTextAlignment.Right);
+            result = text.Draw(currentPage, new PointF(clientSize.Width - 200, iconLocation.Y + 20));
+
+
+
+            //aqui se agrega la direccion del hospital
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            text = new PdfTextElement("Calle Dr. Olvera, 123", font, new PdfSolidBrush(Color.FromArgb(0, 0, 0, 0)));
+            text.StringFormat = new PdfStringFormat(PdfTextAlignment.Right);
+            result = text.Draw(currentPage, new PointF(clientSize.Width - 25, result.Bounds.Y + 10));
+
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            text = new PdfTextElement("Col. Doctores", font, new PdfSolidBrush(Color.FromArgb(0, 0, 0, 0)));
+            text.StringFormat = new PdfStringFormat(PdfTextAlignment.Right);
+            result = text.Draw(currentPage, new PointF(clientSize.Width - 25, result.Bounds.Y + 10));
+
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            text = new PdfTextElement("Ciudad De México", font, new PdfSolidBrush(Color.FromArgb(0, 0, 0, 0)));
+            text.StringFormat = new PdfStringFormat(PdfTextAlignment.Right);
+            result = text.Draw(currentPage, new PointF(clientSize.Width - 25, result.Bounds.Y + 10));
+
+
+
+            //datos generales
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
+            text = new PdfTextElement("Paciente: "+citaPDF?.IdPacienteNavigation?.NombreCompleto, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 50));
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
+            text = new PdfTextElement("Folio Cita: " + citaPDF?.FolioCitas, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
+            text = new PdfTextElement("Estatus Cita: " + citaPDF?.estatusAtencion, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+
+
+
+
+
+            //linea divisora
+            PdfGraphics graphics2 = currentPage.Graphics;
+            PdfPen bluePen = new PdfPen(Color.FromArgb(53, 67, 168), 2f);
+            graphics2.DrawLine(bluePen, new PointF(14, result.Bounds.Bottom + 15), new PointF(clientSize.Width - 14, result.Bounds.Bottom + 15));
+
+
+
+
+
+
+            //contenido de la receta
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 16);
+            text = new PdfTextElement("Datos de la Cita", font);
+            result = text.Draw(currentPage, new PointF(230, result.Bounds.Bottom + 20));
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            text = new PdfTextElement("- Fecha de Creación de la cita: " + citaPDF?.fechaCreacionCita.ToShortDateString() , font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 20));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
+            text = new PdfTextElement("- Fecha de la Cita: "+citaPDF?.fechaCita.ToShortDateString() , font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
+            text = new PdfTextElement("- Hora de inicio de la cita: " + citaPDF.horaInicio , font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
+            text = new PdfTextElement("- Hora de termino de la cita: " + citaPDF.horaTermino, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10,PdfFontStyle.Bold);
+            text = new PdfTextElement("- Doctor seleccionado: " + citaPDF.IdDoctorNavigation?.IdEmpleadoNavigation?.Nombre +" " +citaPDF.IdDoctorNavigation?.IdEmpleadoNavigation?.ApellidoP, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
+            text = new PdfTextElement("- Especialidad: " + citaPDF.IdDoctorNavigation?.IdEspecialidadNavigation?.Especialidades, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10);
+            text = new PdfTextElement("- Consultorio: " + citaPDF.IdDoctorNavigation.IdConsultorioNavigation.Edificio +" " +citaPDF.IdDoctorNavigation.IdConsultorioNavigation.Planta + " "+citaPDF.IdDoctorNavigation.IdConsultorioNavigation.Numero, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 10,PdfFontStyle.Bold);
+            text = new PdfTextElement("- Estatus: " + citaPDF.estatusAtencion, font);
+            result = text.Draw(currentPage, new PointF(14, result.Bounds.Bottom + 10));
+
+
+            font = new PdfStandardFont(PdfFontFamily.Helvetica, 15, PdfFontStyle.Bold);
+            text = new PdfTextElement("PAGASTE LA CITA CORRECTAMENTE", font);
+            result = text.Draw(currentPage, new PointF(200, result.Bounds.Bottom + 30));
+
+
+
+
+            // Aqui se guarda el documento PDF en un MemoryStream
+            MemoryStream stream = new MemoryStream();
+            pdfDocument.Save(stream);
+            pdfDocument.Close(true);
+            stream.Position = 0;
+
+            string nombreArchivo = "Comprobante Cita.pdf";
+
+            return File(stream, "application/pdf", nombreArchivo);
+        }
+
+
+
+
 
         // GET: Citas
         public async Task<IActionResult> Index()
