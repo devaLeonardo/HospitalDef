@@ -21,7 +21,12 @@ namespace HospitalDef.Controllers
         // GET: HistorialCitasMedicoPacientes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.HistorialCitasMedicoPacientes.ToListAsync());
+            var historialOrdenado = await _context.HistorialCitasMedicoPacientes
+                                    .OrderByDescending(h => h.Fecha)
+                                    .ThenByDescending(h => h.Hora)
+                                    .ToListAsync();
+
+            return View(historialOrdenado);
         }
 
         // GET: HistorialCitasMedicoPacientes/Details/5
