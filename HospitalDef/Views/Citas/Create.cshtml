@@ -86,6 +86,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
 
@@ -193,6 +194,25 @@
                 }
             });
         }
+             
+        
+        $(document).ready(function () {
+
+            // Obtener el mensaje de error del doctor (si existe)
+            let errorDoctor = $('span[data-valmsg-for="idDoctor"]').text().trim();
+
+            if (errorDoctor.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Doctor no disponible',
+                    text: errorDoctor,
+                    confirmButtonText: 'Entendido'
+                });
+            }
+
+        });
+
+
 
     </script>
 }

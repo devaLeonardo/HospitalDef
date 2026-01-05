@@ -433,6 +433,33 @@ namespace HospitalDef.Controllers
                     return View("CreateRecepcion", cita);
             }
 
+
+            // ================= VALIDAR DOCTOR ACTIVO =================
+            var doctorCompleto = await _context.Doctors
+                .Include(d => d.IdEmpleadoNavigation)
+                .FirstOrDefaultAsync(d => d.IdDoctor == cita.idDoctor);
+
+            if (doctorCompleto == null)
+            {
+                ModelState.AddModelError("IdDoctor", "El doctor seleccionado no existe.");
+            }
+            else if (doctorCompleto.IdEmpleadoNavigation?.Activo == false)
+            {
+                ModelState.AddModelError("IdDoctor", "No se puede agendar una cita con un doctor inactivo.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                CargarCombos(cita);
+                if (cita.idDoctor.HasValue && cita.idDoctor.Value != 0)
+                    CargarHorarioDoctor(cita.idDoctor.Value);
+
+                if (role.Equals("Paciente"))
+                    return View("Create", cita);
+                else
+                    return View("CreateRecepcion", cita);
+            }
+
             // Guardar en la base de datos los cambios
             _context.Add(cita);
             await _context.SaveChangesAsync();

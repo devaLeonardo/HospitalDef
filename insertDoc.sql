@@ -92,3 +92,5 @@ VALUES
 
 
 select * from Doctor
+
+select * from Especialidades
