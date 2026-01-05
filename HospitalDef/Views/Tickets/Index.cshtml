@@ -135,6 +135,7 @@
                     return;
                 }
 
+
                 try {
                     const response = await fetch(`/Tickets/BuscarMedicamentos?termino=${encodeURIComponent(filtro)}`);
                     if (!response.ok) throw new Error("Error en el servidor");
