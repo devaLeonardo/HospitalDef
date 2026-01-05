@@ -22,3 +22,27 @@ VALUES
 );
 
 
+
+---update
+UPDATE nombre_tabla
+SET columna1 = valor1,
+    columna2 = valor2,
+    ...
+WHERE condicion;
+--updete con join 
+UPDATE e
+SET e.Salario = e.Salario * 1.10
+FROM Empleados e
+INNER JOIN Departamentos d ON e.IdDepartamento = d.IdDepartamento
+WHERE d.Nombre = 'Sistemas';
+
+
+
+----delete
+DELETE FROM nombre_tabla
+WHERE condicion;
+---delete con join 
+DELETE c
+FROM Citas c
+INNER JOIN Pacientes p ON c.IdPaciente = p.IdPaciente
+WHERE p.Activo = 0;

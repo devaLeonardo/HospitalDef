@@ -96,28 +96,65 @@ namespace HospitalDef.Controllers
 
                 var itemsAgrupados = datos.Items
                     .GroupBy(i => new { i.Id, i.Tipo })
-                    .Select(g => new {
+                    .Select(g => new
+                    {
                         Id = g.Key.Id,
                         Tipo = g.Key.Tipo,
                         Nombre = g.First().Nombre,
                         Precio = g.First().Precio,
-                        Cantidad = g.Count() 
+                        Cantidad = g.Count()
                     });
+                // ===== VALIDACIÓN DE STOCK =====
+                foreach (var grupo in itemsAgrupados)
+                {
+                    if (grupo.Tipo == "Medicamento")
+                    {
+                        int idMedicamento = int.Parse(grupo.Id);
+
+                        var medicamento = await _context.Medicamentos
+                            .FirstOrDefaultAsync(m => m.IdMedicamento == idMedicamento);
+
+                        if (medicamento == null)
+                        {
+                            await transaction.RollbackAsync();
+                            return Json(new { success = false, mensaje = "Medicamento no encontrado" });
+                        }
+
+                        if (medicamento.Stock < grupo.Cantidad)
+                        {
+                            await transaction.RollbackAsync();
+                            return Json(new
+                            {
+                                success = false,
+                                mensaje = $"No hay stock suficiente de {medicamento.NombreMedicamento}"
+                            });
+                        }
+                    }
+                }
+
 
                 foreach (var grupo in itemsAgrupados)
                 {
                     if (grupo.Tipo == "Medicamento")
                     {
+                        int idMedicamento = int.Parse(grupo.Id);
+
+                        var medicamento = await _context.Medicamentos
+                            .FirstOrDefaultAsync(m => m.IdMedicamento == idMedicamento);
+
+                        
+                        medicamento.Stock -= grupo.Cantidad;
+
                         _context.DetallesMedicamentos.Add(new DetallesMedicamento
                         {
                             FolioTicket = nuevoTicket.FolioTicket,
-                            IdMedicamento = int.Parse(grupo.Id),
+                            IdMedicamento = idMedicamento,
                             Precio = grupo.Precio,
-                            Cantidad = grupo.Cantidad, 
+                            Cantidad = grupo.Cantidad,
                             SubTotal = grupo.Precio * grupo.Cantidad
                         });
                     }
-                    else 
+                    else
                     {
                         _context.DetallesServicios.Add(new DetallesServicio
                         {
