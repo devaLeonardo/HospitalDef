@@ -29,6 +29,7 @@ namespace HospitalDef.Controllers
             return View(historialOrdenado);
         }
 
+
         // GET: HistorialCitasMedicoPacientes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
