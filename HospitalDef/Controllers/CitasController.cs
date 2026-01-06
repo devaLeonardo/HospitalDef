@@ -534,7 +534,7 @@ namespace HospitalDef.Controllers
                 .FirstOrDefaultAsync();
 
             if (citaPendiente != null)
-                ModelState.AddModelError("FechaCita", "Ya tienes una cita pendiente con este doctor.");
+                ModelState.AddModelError("FechaCita", "Ya tienes una cita pendiente con este doctor");
 
             if (!ModelState.IsValid)
             {
