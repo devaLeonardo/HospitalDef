@@ -217,7 +217,7 @@ namespace HospitalDef.Controllers
             bool tieneCitasPendientes = await _context.Citas.AnyAsync(c =>
                 c.idDoctor == id &&
                 c.fechaCita >= DateTime.Today &&     // futuras o de hoy
-                c.estatusAtencion == "PAGADO"               // ajusta según tu modelo
+                c.estatusAtencion == "Cita pagada pendiente por atender" || c.estatusAtencion == "Agendada pendiente por pagar"                // ajusta según tu modelo
             );
 
             if (tieneCitasPendientes)
